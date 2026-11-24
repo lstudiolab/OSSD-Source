@@ -78,6 +78,14 @@ cacheable RAM. Bounded 8/16/32-bit MMIO accessors validate alignment and range
 and issue sequentially consistent fences. The caller must serialize BAR sizing
 against all other config-space access.
 
+The DMA contract now validates one contiguous device-visible segment against
+alignment, address-width, and no-crossing-boundary constraints. It records
+the transfer direction, rejects incompatible CPU/device synchronization,
+and delegates cache maintenance and actual allocation to a platform
+provider. The contract is tested, but there is not yet an x86-64 or arm64
+physical DMA allocator/IOMMU provider wired into XCU; therefore this does not
+yet enable Realtek DMA rings or bus mastering.
+
 The registry remains a binding contract: it does not assign BAR addresses,
 allocate DMA, configure MSI/MSI-X, or provide a concrete platform resource
 provider. Registry mutation and device lifecycle calls must currently be
