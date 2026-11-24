@@ -139,6 +139,9 @@ struct ossd_pci_msi_state {
 	uint16_t original_control;
 	uint16_t original_command;
 	uint32_t original_mask;
+	uint32_t original_address_low;
+	uint32_t original_address_high;
+	uint32_t original_data;
 	uint8_t capability_offset;
 	uint16_t mask_register_offset;
 	uint8_t has_per_vector_mask;
