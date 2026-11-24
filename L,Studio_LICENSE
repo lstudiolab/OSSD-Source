@@ -1,0 +1,218 @@
+L Studio Public Source License (LSPSL)
+Version 1.0
+
+PLEASE READ THIS LICENSE CAREFULLY BEFORE USING, MODIFYING, SELLING, OR
+DISTRIBUTING THE SOFTWARE. BY USING, MODIFYING, DISTRIBUTING, OR EXTERNALLY
+DEPLOYING THE COVERED CODE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS LICENSE.
+
+1. Definitions
+
+1.1 "Applicable Patent Rights" means any patent claims owned, controlled, or
+licensable by a Licensor or Contributor that are necessarily infringed by
+making, using, selling, offering for sale, or distributing the Original Code or
+a Contributor's Modifications.
+
+1.2 "Closed-Source" means any software, branch, version, release, or work
+that is not made publicly available in Source Code form under this License, or
+that L Studio has withdrawn from open-source release, made proprietary, or
+transitioned to closed-source status.
+
+1.3 "Contributor" means any individual or legal entity that creates or
+contributes to the creation of Modifications.
+
+1.4 "Covered Code" means the Original Code, Modifications, the combination of
+Original Code and any Modifications, and any respective portions thereof, to the
+extent such code is actively released as open-source under this License and is
+not Closed-Source.
+
+1.5 "Externally Deploy" means: (a) to sublicense, distribute, sell, or
+otherwise make Covered Code available, directly or indirectly, to any third
+party; or (b) to use Covered Code, alone or as part of a Larger Work, to provide
+a commercial or non-commercial service, hosted application, or content delivery
+to third parties over a computer network.
+
+1.6 "Larger Work" means a separate, distinct project or work created by You
+that implements, integrates, or combines Covered Code (or portions thereof)
+with separate original code, modules, or assets not governed by this License,
+and that has a substantially different purpose, architecture, or identity from
+the Original Code as a standalone project.
+
+1.7 "L Studio" means the original author and copyright holder designated in
+the Original Code notice.
+
+1.8 "Modifications" means any addition to, deletion from, or change to the
+substance or structure of Covered Code. Where Covered Code is structured as
+separate files, a Modification includes any change to an existing file
+containing Covered Code, as well as any new file containing any portion of
+Covered Code.
+
+1.9 "Original Code" means the Source Code of the software program or work
+originally released by L Studio as open-source under this License, including any
+updates or upgrades explicitly identified by L Studio as open-source and
+subject to this License.
+
+1.10 "Source Code" means the human-readable form of a program suitable for
+making modifications, including all modules, interface definition files, and
+scripts used to control compilation and installation.
+
+1.11 "You" (or "Your") means an individual or legal entity exercising rights
+under this License, including any parent, subsidiary, or affiliate under 50%
+or more common ownership or control.
+
+2. Grant of Rights (Implementation and Commercial Use)
+
+2.1 Grant from L Studio. Subject to Your compliance with this License and
+Section 2.4 (Closed-Source Restriction), L Studio grants You a worldwide,
+royalty-free, non-exclusive license under L Studio's copyrights and Applicable
+Patent Rights to:
+  (a) Use, reproduce, display, perform, and modify Original Code for Your own
+      use or to implement/integrate it into a Larger Work; and
+  (b) Distribute, sell, offer for sale, commercially exploit, and Externally
+      Deploy Covered Code only when implemented within a Larger Work or as
+      permitted under Section 3, provided You satisfy all conditions in
+      Section 3.
+
+2.2 Grant from Contributors. Subject to Your compliance with this License and
+Section 2.4, each Contributor grants You a worldwide, royalty-free,
+non-exclusive license under that Contributor's copyrights and Applicable Patent
+Rights to use, reproduce, modify, implement into a Larger Work, distribute,
+sell, offer for sale, commercially exploit, and Externally Deploy their
+Modifications on the same terms as Section 2.1.
+
+2.3 Right to Charge Fees. You may charge a fee for distributing or selling a
+Larger Work that implements Covered Code, or for providing warranty, support,
+hosting, or other commercial services related to Covered Code, provided that
+You make the Source Code of the Covered Code available free of charge as
+required under Section 3.3.
+
+2.4 Closed-Source Restriction (No Right to Use Once Closed-Source). Once a
+project, branch, version, or release is made Closed-Source by L Studio—or once
+open-source distribution of it is ended and it becomes Closed-Source—You have
+no right under this License to access, use, copy, modify, implement,
+distribute, or sell that Closed-Source code or any features, updates, or
+additions introduced in it. Rights granted under this License apply strictly to
+code that remains open-source under this License, and any license rights to
+Closed-Source code cease immediately upon its transition to Closed-Source
+status unless L Studio grants separate written permission.
+
+3. Restrictions and Conditions for Distribution and External Deployment
+
+You may distribute, sell, or Externally Deploy Covered Code only if You meet
+all of the following conditions:
+
+3.1 No Ownership or Project Renaming. You do not acquire any ownership or
+copyright title in the Original Code or the L Studio project. You may not
+rename, rebrand, or pass off the Original Code or a lightly edited copy of L
+Studio's repository as Your own project, product, or creation. The project
+name, repository identity, and attribution to L Studio must remain intact on
+the Original Code.
+
+3.2 Implementation Requirement (No Reselling Cloned/Edited Main Projects). You
+may only distribute, sell, or Externally Deploy Covered Code by implementing or
+integrating it into another, separate Larger Work. You may NOT simply take the
+project from L Studio's repository, make cosmetic or surface edits to make it
+appear as Your own main project, and distribute or sell that modified copy as a
+competing or standalone replacement for the project.
+
+3.3 Free Source Code Availability. Regardless of whether You charge a fee for
+a Larger Work or service, You must make the Source Code of all Your
+Modifications to Covered Code (and the underlying Original Code) publicly
+available under the terms of this License at no charge (except for the
+reasonable physical cost of media if distributed offline), via a standard
+electronic distribution mechanism (such as a public Git repository or web
+download), for as long as You Externally Deploy or distribute the Covered Code
+and for at least twelve (12) months thereafter.
+
+3.4 Notice and License Retention. You must retain all copyright, patent,
+trademark, and attribution notices in the Original Code, and include a copy of
+this License with every distribution of Covered Code. You must also document
+any Modifications You make, including the date of each change, inside the
+modified files.
+
+3.5 Executable and Commercial Distributions. If You distribute or sell a
+Larger Work containing Covered Code in compiled or executable form, You must
+include a prominent notice in Your documentation, product packaging, or "About"
+screen identifying the Covered Code, attributing L Studio, and explaining how
+recipients can obtain the corresponding Source Code free of charge under
+Section 3.3.
+
+3.6 Larger Works. You may create a Larger Work by implementing Covered Code
+with separate files governed by different license terms (including commercial,
+closed-source, or proprietary licenses) and sell, license, or distribute the
+Larger Work under terms and pricing of Your choice, provided that:
+  (a) The Larger Work is a genuinely distinct project rather than a renamed or
+      cosmetically edited version of L Studio's repository;
+  (b) The Covered Code portions remain strictly governed by this License;
+  (c) You do not restrict recipients' rights to the Covered Code under this
+      License; and
+  (d) You comply with all Source Code availability and notice requirements of
+      this License for the Covered Code.
+
+4. Trademarks and Branding
+
+This License does not grant any permission to use the trade names, trademarks,
+service marks, or product names of L Studio or any Contributor, except as
+required for reasonable and customary use in describing the origin of the
+Original Code and reproducing copyright notices. You may market and sell Your
+Larger Work under Your own trademarks and branding, provided You do not imply
+endorsement by L Studio or rename L Studio's project as Your own.
+
+5. Termination and Patent Retaliation
+
+5.1 Breach. This License and the rights granted hereunder will terminate
+automatically if You fail to comply with any term herein and fail to cure such
+breach within thirty (30) days of becoming aware of it.
+
+5.2 Patent Litigation. If You initiate patent litigation (including a
+cross-claim or counterclaim) against L Studio or any Contributor alleging that
+the Original Code or a Modification directly or contributorily infringes any
+patent, then all patent and copyright licenses granted to You under this
+License shall terminate immediately as of the date such litigation is filed.
+
+5.3 Survival. Sections 1, 2.4, 3.1, 3.2, 4, 5.3, 6, 7, and 8 survive any
+termination of this License. End-user and customer sublicenses properly
+granted prior to termination shall survive provided those end users remain in
+compliance.
+
+6. Disclaimer of Warranty
+
+COVERED CODE IS PROVIDED UNDER THIS LICENSE ON AN "AS IS" AND "AS AVAILABLE"
+BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING,
+WITHOUT LIMITATION, WARRANTIES THAT THE COVERED CODE IS FREE OF DEFECTS,
+MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE, OR NON-INFRINGING. THE ENTIRE RISK
+AS TO THE QUALITY AND PERFORMANCE OF THE COVERED CODE IS WITH YOU.
+
+7. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL L STUDIO OR
+ANY CONTRIBUTOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, WITHOUT LIMITATION, LOSS OF
+DATA, LOSS OF PROFITS, OR BUSINESS INTERRUPTION) ARISING IN ANY WAY OUT OF THE
+USE, INABILITY TO USE, SALE, OR EXTERNAL DEPLOYMENT OF THE COVERED CODE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+8. General Provisions
+
+8.1 Governing Law. This License shall be governed by and construed in
+accordance with the laws of the jurisdiction in which L Studio maintains its
+principal place of business, excluding conflict-of-law principles.
+
+8.2 Severability. If any provision of this License is held invalid or
+unenforceable, the remaining provisions shall remain in full force and effect.
+
+8.3 Entire Agreement. This License constitutes the entire agreement between
+the parties with respect to the Covered Code.
+
+---
+
+SOURCE FILE HEADER TEMPLATE (Copy into the top of your source files):
+
+Copyright (c) [Year] L Studio. All rights reserved.
+
+This file is subject to the terms and conditions of the L Studio Public
+Source License, Version 1.0 (the "License"). You may not use this file
+except in compliance with the License. You may obtain a copy of the
+License in the LICENSE file at the root of this repository.
+
+Software distributed under the License is distributed on an "AS IS" basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied.
