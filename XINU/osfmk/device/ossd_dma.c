@@ -130,7 +130,9 @@ ossd_dma_sync_for_cpu(const struct ossd_dma_provider_ops *ops,
 	int error;
 	if (ops == 0 || ops->sync_for_cpu == 0 ||
 	    !dma_range_valid(mapping, offset, length) ||
-	    !dma_valid_direction(direction)) return -1;
+	    !dma_valid_direction(direction) ||
+	    (mapping->direction != OSSD_DMA_BIDIRECTIONAL &&
+	    mapping->direction != (uint8_t)direction)) return -1;
 	__atomic_thread_fence(__ATOMIC_SEQ_CST);
 	error = ops->sync_for_cpu(context, mapping, offset, length, direction);
 	__atomic_thread_fence(__ATOMIC_SEQ_CST);
