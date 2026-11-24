@@ -27,4 +27,4 @@
  */
 #include <mach/mach_host.defs>
 
-import <mach/mach_init.h>;  /* for host_page_size() */
+import <mach/mach_init.h>;                            

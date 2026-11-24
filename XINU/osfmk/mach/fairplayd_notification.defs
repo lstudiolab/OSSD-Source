@@ -26,25 +26,25 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *  Interface definition for the fairplay upcall mechanism.
- */
+  
+                                                           
+   
 
 subsystem
 #if KERNEL_USER
     KernelUser
-#endif /* KERNEL_USER */
+#endif                  
     fairplay 41471;
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 
-/*
- * Notification from the kernel requesting a new arcade service
- * port from fairplayd. Instead of replying with a port, the
- * new port passed to the arcade_provider port sent here via
- * arcade_set_upcall_port().
- */
+  
+                                                               
+                                                            
+                                                            
+                            
+   
 simpleroutine fairplayd_arcade_request(
               fairplayd_port    : mach_port_t;
               arcade_reg_port   : mach_port_t);

@@ -29,7 +29,7 @@
 subsystem
 #if KERNEL_SERVER
 	KernelServer
-#endif /* KERNEL_SERVER */
+#endif                    
 	UNDReply 6200;
 
 #include <mach/std_types.defs>
@@ -44,4 +44,4 @@ simpleroutine UNDNotificationCreated_rpc(
 				reply: UNDReplyRef;
 			in	userLandNotificationKey: int);
 
-/* vim: set ft=c : */
+                     

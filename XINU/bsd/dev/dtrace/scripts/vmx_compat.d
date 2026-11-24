@@ -21,10 +21,10 @@
  * Copyright 2011 Joyent, Inc.  All rights reserved.
  */
 
-/*
- * This file delivers VMX description that is compatible with DTrace
- * upstream.
- */
+  
+                                                                    
+            
+   
 
 enum vmregs_vmx {
 	VMX_VIRTUAL_PROCESSOR_ID			= 0x00000000,

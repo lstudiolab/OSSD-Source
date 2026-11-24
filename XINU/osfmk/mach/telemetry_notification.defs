@@ -2,14 +2,14 @@
  * Copyright (c) 2012, Apple Inc.  All rights reserved.
  */
 
- /*
- *  Interface definition for the telemetry facility.
- */
+   
+                                                    
+   
 
 subsystem
 #if	KERNEL_USER
     KernelUser
-#endif	/* KERNEL_USER */
+#endif	                 
     telemetry_notification 5100;
 
 #include <mach/std_types.defs>

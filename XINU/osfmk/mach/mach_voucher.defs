@@ -29,19 +29,19 @@
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		       mach_voucher 5400;
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 
-/* extract just the content data for a <voucher, key> pair */
+                                                             
 routine mach_voucher_extract_attr_content(
 		voucher		: ipc_voucher_t;
 		key		: mach_voucher_attr_key_t;
 	out	content		: mach_voucher_attr_content_t, CountInOut);
 
-/* extract a recipe to reconstitue a <voucher, key> pair item in a future voucher */
+                                                                                    
 #if !KERNEL && !LIBSYSCALL_INTERFACE
 routine _kernelrpc_mach_voucher_extract_attr_recipe(
 #else
@@ -51,12 +51,12 @@ routine mach_voucher_extract_attr_recipe(
 		key		: mach_voucher_attr_key_t;
 	out	recipe		: mach_voucher_attr_raw_recipe_t, CountInOut);
 
-/* extract a recipe array to reconstitue all the key values in a future voucher */
+                                                                                  
 routine mach_voucher_extract_all_attr_recipes(	
 		voucher		: ipc_voucher_t;
 	out	recipes		: mach_voucher_attr_raw_recipe_array_t, CountInOut);
 
-/* execute a command against a given voucher attribute */
+                                                         
 routine mach_voucher_attr_command(
 		voucher		: ipc_voucher_t;
 		key		: mach_voucher_attr_key_t;
@@ -64,10 +64,10 @@ routine mach_voucher_attr_command(
 		in_content	: mach_voucher_attr_content_t;
 	out	out_content	: mach_voucher_attr_content_t, CountInOut);
 
-/* extract a recipe array to reconstitue all the key values in a future voucher */
+                                                                                  
 routine mach_voucher_debug_info(
 		task		: ipc_space_read_t;
 		voucher_name: mach_port_name_t;
 	out	recipes		: mach_voucher_attr_raw_recipe_array_t, CountInOut);
 
-/* vim: set ft=c : */
+                     

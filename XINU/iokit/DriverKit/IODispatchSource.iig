@@ -34,12 +34,12 @@
 
 typedef void (^IODispatchSourceCancelHandler)(void);
 
-/*!
- * @class IODispatchSource
+   
+                          
 
- * @abstract
- * IODispatchSource common base class for dispatch sources.
- */
+            
+                                                           
+   
 
 class NATIVE KERNEL IODispatchSource : public OSObject
 {
@@ -66,4 +66,4 @@ public:
 	SetEnable(bool enable) LOCAL;
 };
 
-#endif /* ! _IOKIT_UIODISPATCHSOURCE_H */
+#endif                                   

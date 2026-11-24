@@ -53,22 +53,22 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- * File:	mach/upl.defs
- *
- * Abstract:
- *	Basic Mach external memory management interface declaration.
- */
+  
+   
+  
+                      
+  
+            
+                                                               
+   
 
 subsystem
 #if	KERNEL_USER
 	  KernelUser
-#endif	/* KERNEL_USER */
+#endif	                 
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		     upl 2050;
 
 #include <mach/std_types.defs>
@@ -97,4 +97,4 @@ routine upl_commit_range(
 	in	page_list	: upl_page_info_array_t;
 	out	empty		: boolean_t);
 
-/* vim: set ft=c : */
+                     

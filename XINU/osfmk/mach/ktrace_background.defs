@@ -26,15 +26,15 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Interface definition for background available notifications for the
- * kernel trace facility.
- */
+  
+                                                                      
+                         
+   
 
 subsystem
 #if KERNEL_USER
     KernelUser
-#endif /* KERNEL_USER */
+#endif                  
     ktrace_background 670;
 
 #include <mach/std_types.defs>
@@ -46,4 +46,4 @@ userprefix   send_;
 simpleroutine ktrace_background_available(
               ktrace_background_port : mach_port_t);
 
-/* vim: set ft=c : */
+                     

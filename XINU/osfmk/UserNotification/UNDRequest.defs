@@ -29,25 +29,25 @@
 subsystem
 #if KERNEL_USER
 	KernelUser
-#endif /* KERNEL_USER */
+#endif                  
 	UNDRequest 6000;
 
 #include <mach/std_types.defs>
 #include <UserNotification/UNDTypes.defs>
 
 
-/*
---	Messages sent by the UserNotification Client to the Server
-*/
+  
+                                                             
+  
 
-/* Execution information */
+                           
 simpleroutine UNDExecute_rpc(
 				server: UNDServerRef;
 			in	executionPath: UNDPath;
 			in	uid: int;
 			in 	gid: int);
 
-/* Bundle notice and bundle alert */
+                                    
 
 simpleroutine UNDDisplayNoticeFromBundle_rpc(
 				server: UNDServerRef;
@@ -74,16 +74,16 @@ simpleroutine UNDDisplayCustomFromBundle_rpc(
 			in	messageKey: UNDKey;
 			in	tokenKey: UNDPath);
 
-skip; /* was UNDDisplayCustomFromDictionary_rpc */
+skip;                                             
 
 simpleroutine UNDCancelNotification_rpc(
 				server: UNDServerRef;
 			in	userLandNotificationKey: int);
 
-/*
- * Just pops up a notice with a single OK button and the label and message
- * specified below.  As such, there is no acknowledgement from the server.
- */
+  
+                                                                          
+                                                                          
+   
 simpleroutine UNDDisplayNoticeSimple_rpc(
 				server: UNDServerRef;
                         in	rpctimeout: int;
@@ -95,12 +95,12 @@ simpleroutine UNDDisplayNoticeSimple_rpc(
 			in	message: UNDMessage;
                         in	defaultButtonTitle:UNDLabel);
 
-/*
- * A synchronous routine to display an alert.  This will wait for the
- * result to come back.  As this can take an exceedingly long time to
- * complete (and will block the calling thread for the duration) great
- * care should be exercised before using this method.
- */
+  
+                                                                     
+                                                                     
+                                                                      
+                                                     
+   
 routine UNDDisplayAlertSimple_rpc(
 				server: UNDServerRef;
                         in	rpctimeout: int;
@@ -115,4 +115,4 @@ routine UNDDisplayAlertSimple_rpc(
                         in	otherButtonTitle:UNDLabel;
 			out	response: unsigned);
 
-/* vim: set ft=c : */
+                     

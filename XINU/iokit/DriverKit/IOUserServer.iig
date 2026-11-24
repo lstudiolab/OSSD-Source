@@ -34,11 +34,11 @@
 #include <DriverKit/IOService.iig>
 
 
-/*!
-@iig implementation
-#include <IOKit/IOUserServer.h>
-@iig end
-*/
+   
+                   
+                               
+        
+  
 
 class KERNEL IOUserServer : public IOService
 {
@@ -63,4 +63,4 @@ public:
 	LoadModule(const char path[1024]) LOCAL;
 };
 
-#endif /* ! _IOKIT_UIOUSERSERVER_H */
+#endif                               

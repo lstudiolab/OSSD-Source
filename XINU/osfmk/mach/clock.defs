@@ -28,49 +28,49 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- * 	File:		mach/clock.defs
- *	Purpose:	Kernel clock subsystem definitions. This
- *			file defines the clock request interface.
- */
+  
+                          
+                                                    
+                                              
+   
 
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		       clock 1000;
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 #include <mach/clock_types.defs>
 
-/*
- * References to clock objects are returned by:
- *	host_get_clock_service(host_t,...)
- *	host_get_clock_control(host_priv_t,...) - Priviledged subclass
- */
+  
+                                               
+                                     
+                                                                 
+   
 
-/*
- *	Get the clock time.
- *	Available to all.
- */
+  
+                      
+                    
+   
 routine	clock_get_time(
 		clock_serv	: clock_serv_t;
 	out	cur_time	: mach_timespec_t);
 
-/*
- *	Get clock attributes.
- *	Available to all.
- */
+  
+                        
+                    
+   
 routine	clock_get_attributes(
 		clock_serv	: clock_serv_t;
 	in	flavor		: clock_flavor_t;
 	out	clock_attr	: clock_attr_t, CountInOut);
 
-/*
- *	Setup a clock alarm.
- *	Available to all.
- */
+  
+                       
+                    
+   
 routine clock_alarm(
 		clock_serv	: clock_serv_t;
 		alarm_type	: alarm_type_t;
@@ -78,4 +78,4 @@ routine clock_alarm(
                 alarm_port      : clock_reply_t =
 			MACH_MSG_TYPE_MAKE_SEND_ONCE|polymorphic);
 
-/* vim: set ft=c : */
+                     

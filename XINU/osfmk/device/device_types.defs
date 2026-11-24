@@ -53,21 +53,21 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	Author: David B. Golub, Carnegie Mellon University
- *	Date: 	3/89
- *	
- *	Common definitions for device interface types.
- */
+  
+   
+  
+                                                     
+              
+   
+                                                 
+   
 
 #ifndef	_DEVICE_DEVICE_TYPES_DEFS_
 #define	_DEVICE_DEVICE_TYPES_DEFS_
 
-/*
- *	Basic types
- */
+  
+              
+   
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
@@ -89,7 +89,7 @@ type device_t = mach_port_t
 		intran: device_t dev_port_lookup(mach_port_t)
 		outtran: mach_port_t convert_device_to_port(device_t)
 		destructor: device_deallocate(device_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type io_done_queue_t	= mach_port_t
@@ -97,11 +97,11 @@ type io_done_queue_t	= mach_port_t
 #if	KERNEL_SERVER
 		intran: io_done_queue_t io_done_queue_port_lookup(mach_port_t)
 		outtran: mach_port_t convert_io_done_queue_to_port(io_done_queue_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 import <device/device_types.h>;
 
-#endif	/* _DEVICE_DEVICE_TYPES_DEFS_ */
+#endif	                                
 
-/* vim: set ft=c : */
+                     

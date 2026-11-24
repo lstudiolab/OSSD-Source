@@ -26,23 +26,23 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *  Interface definition for the Activity Trace Manager facility.
- */
+  
+                                                                 
+   
 
 subsystem
 #if	KERNEL_USER
     KernelUser
-#endif	/* KERNEL_USER */
+#endif	                 
     atm_notification 11500;
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 #include <atm/atm_types.defs>
 
-/*
- * Routine:
- */
+  
+           
+   
 simpleroutine atm_collect_trace_info(
 		atm_port                : mach_port_move_send_t;
 		activity_trace_id       : atm_aid_t;
@@ -60,4 +60,4 @@ simpleroutine atm_inspect_process_buffer(
 		trace_buffer			: mach_port_t
 );
 
-/* vim: set ft=c : */
+                     

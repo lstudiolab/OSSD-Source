@@ -64,12 +64,12 @@ simpleroutine lockd_request(
 	fh		: nfs_handle
 );
 
-/* Ping lockd, have launchd start it if its not running */
+                                                          
 routine lockd_ping(
 	server		: mach_port_t
 );
 
-/* Shutdown lockd */
+                    
 simpleroutine lockd_shutdown(
 	server		: mach_port_t
 );

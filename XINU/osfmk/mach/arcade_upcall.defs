@@ -27,14 +27,14 @@
 * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *  Interface definition for the fairplay upcall mechanism.
- */
+  
+                                                           
+   
 
 subsystem
 #if KERNEL_USER
     KernelUser
-#endif /* KERNEL_USER */
+#endif                  
     arcade_upcall 61471;
 
 #include <mach/std_types.defs>
@@ -46,5 +46,5 @@ routine arcade_upcall(
 	          offset            : uint64_t;
 	out       should_kill       : boolean_t); 
 
-/* vim: set ft=c : */
+                     
 

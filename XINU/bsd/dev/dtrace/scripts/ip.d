@@ -25,10 +25,10 @@
 #pragma D depends_on module mach_kernel
 #pragma D depends_on provider ip
 
-/* Translators for IP dtrace provider */
+                                        
 
 typedef struct pktinfo {
-	struct mbuf *pkt_addr;	/* Pointer to the packet (struct mbuf) */
+	struct mbuf *pkt_addr;	                                         
 } pktinfo_t;
 
 #pragma D binding "1.0" translator
@@ -43,7 +43,7 @@ typedef struct csinfo {
 	string	  ip_daddr;
 	string	  ip_saddr;
 	uint8_t	  protocol;
-	struct inpcb *cs_addr;	/* Pointer to inpcb (struct inpcb) */
+	struct inpcb *cs_addr;	                                     
 } csinfo_t;
 
 #pragma D binding "1.0" translator
@@ -62,18 +62,18 @@ translator csinfo_t < struct inpcb *P > {
 };
 
 typedef struct ipinfo {
-	uint8_t  ip_ver;		/* IP version (4, 6) */
-	uint16_t ip_plength;		/* payload length */
-	string   ip_saddr;		/* source address */
-	string   ip_daddr;		/* destination address */
+	uint8_t  ip_ver;		                       
+	uint16_t ip_plength;		                    
+	string   ip_saddr;		                    
+	string   ip_daddr;		                         
 } ipinfo_t;
 
-/*
- * The ip vhl byte is the first byte in struct ip. The type names are
- * different depending on whether _IP_VHL is defined or not and that will
- * confuse dtrace. So instead of using type names, just cast and extract
- * version and header length info from the ip structure.
- */
+  
+                                                                     
+                                                                         
+                                                                        
+                                                        
+   
 #pragma D binding "1.0" translator
 translator ipinfo_t < struct ip * ip > {
 	ip_ver = (ip != NULL) ? ((*(uint8_t *) ip) & 0xf0) >> 4 : 0;
@@ -91,10 +91,10 @@ translator ipinfo_t < struct ip6_hdr *ip6 > {
 	ip_daddr = (ip6 != NULL) ? inet_ntoa6(&ip6->ip6_dst) : "<null>";
 };
 
-/*
- * void_ip_t is a void pointer to either an IPv4 or IPv6 header. It has
- * its own type name so that a translator can be determined.
- */
+  
+                                                                       
+                                                            
+   
 typedef uintptr_t void_ip_t;
 #pragma D binding "1.0" translator
 translator ipinfo_t < void_ip_t *i> {
@@ -114,12 +114,12 @@ translator ipinfo_t < void_ip_t *i> {
 };
 
 typedef struct ifinfo {
-	string    if_name;		/* interface name */
-	int8_t    if_local;		/* is delivered locally */
-	int8_t    if_ipstack;		/* ipstack id */
-	struct ifnet *if_addr;		/* pointer to raw ill_t */
-	uint16_t  if_flags;		/* flags: up/down, broadcast etc. */
-	uint32_t  if_eflags;		/* extended flags */
+	string    if_name;		                    
+	int8_t    if_local;		                          
+	int8_t    if_ipstack;		                
+	struct ifnet *if_addr;		                          
+	uint16_t  if_flags;		                                    
+	uint32_t  if_eflags;		                    
 	uint16_t  if_unit;
 } ifinfo_t;
 
@@ -136,22 +136,22 @@ translator ifinfo_t < struct ifnet *ifp > {
 };
 
 typedef struct ipv4info {
-	uint8_t	  ipv4_ver;		/* IP version (4) */
-	uint8_t   ipv4_ihl;		/* header length, bytes */
-	uint8_t   ipv4_tos;		/* type of service field */
-	uint16_t  ipv4_length;		/* length (header + payload) */
-	uint16_t  ipv4_ident;		/* identification */
-	uint8_t   ipv4_flags;		/* IP flags */
-	uint16_t  ipv4_offset;		/* fragment offset */
-	uint8_t   ipv4_ttl;		/* time to live */
-	uint8_t   ipv4_protocol;	/* next level protocol */
-	string    ipv4_protostr;	/* next level protocol, as a string */
-	uint16_t  ipv4_checksum;	/* header checksum */
-	in_addr_t ipv4_src;		/* source address */
-	in_addr_t ipv4_dst;		/* destination address */
-	string    ipv4_saddr;		/* source address, string */
-	string    ipv4_daddr;		/* destination address, string */
-	struct ip *ipv4_hdr;		/* pointer to raw header */
+	uint8_t	  ipv4_ver;		                    
+	uint8_t   ipv4_ihl;		                          
+	uint8_t   ipv4_tos;		                           
+	uint16_t  ipv4_length;		                               
+	uint16_t  ipv4_ident;		                    
+	uint8_t   ipv4_flags;		              
+	uint16_t  ipv4_offset;		                     
+	uint8_t   ipv4_ttl;		                  
+	uint8_t   ipv4_protocol;	                         
+	string    ipv4_protostr;	                                      
+	uint16_t  ipv4_checksum;	                     
+	in_addr_t ipv4_src;		                    
+	in_addr_t ipv4_dst;		                         
+	string    ipv4_saddr;		                            
+	string    ipv4_daddr;		                                 
+	struct ip *ipv4_hdr;		                           
 } ipv4info_t;
 
 #pragma D binding "1.0" translator
@@ -184,18 +184,18 @@ translator ipv4info_t < struct ip *ip > {
 };
 
 typedef struct ipv6info {
-	uint8_t    ipv6_ver;		/* IP version (6) */
-	uint8_t    ipv6_tclass;		/* traffic class */
-	uint32_t   ipv6_flow;		/* flow label */
-	uint16_t   ipv6_plen;		/* payload length */
-	uint8_t    ipv6_nexthdr;	/* next header protocol */
-	string     ipv6_nextstr;	/* next header protocol, as a string */
-	uint8_t    ipv6_hlim;		/* hop limit */
-	struct in6_addr *ipv6_src;	/* source address, pointer to struct in6_addr */
-	struct in6_addr *ipv6_dst;	/* destination address, pointer to struct in6_addr */
-	string     ipv6_saddr;		/* source address, string */
-	string     ipv6_daddr;		/* destination address, string */
-	struct ip6_hdr *ipv6_hdr;	/* pointer to raw header */
+	uint8_t    ipv6_ver;		                    
+	uint8_t    ipv6_tclass;		                   
+	uint32_t   ipv6_flow;		                
+	uint16_t   ipv6_plen;		                    
+	uint8_t    ipv6_nexthdr;	                          
+	string     ipv6_nextstr;	                                       
+	uint8_t    ipv6_hlim;		               
+	struct in6_addr *ipv6_src;	                                                
+	struct in6_addr *ipv6_dst;	                                                     
+	string     ipv6_saddr;		                            
+	string     ipv6_daddr;		                                 
+	struct ip6_hdr *ipv6_hdr;	                           
 } ipv6info_t;
 
 #pragma D binding "1.0" translator

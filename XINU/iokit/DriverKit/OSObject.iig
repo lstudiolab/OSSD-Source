@@ -41,14 +41,14 @@
 #include <DriverKit/IOReturn.h>
 #if DRIVERKIT_PRIVATE
 #include <mach/port.h>
-#endif /* DRIVERKIT_PRIVATE */
+#endif                        
 #if !__IIG
 #include <string.h>
 #include <DriverKit/OSMetaClass.h>
-#endif	/* !__IIG */
+#endif	            
 class OSObject;
 typedef OSObject * OSObjectPtr;
-#endif /* !KERNEL */
+#endif              
 
 #if !__IIG_ATTRIBUTES_DEFINED__
 
@@ -68,16 +68,16 @@ typedef OSObject * OSObjectPtr;
 #define IIG_PORTCOPYSEND 		__attribute__((annotate("MACH_MSG_TYPE_COPY_SEND")))
 #define IIG_TARGET       		__attribute__((annotate("target")))
 #define IIG_TYPE(p)      		__attribute__((annotate("type=" # p)))
-//#define IIG_ARRAY(maxcount)	__attribute__((annotate(# maxcount), annotate("array")))
+                                                                                      
 #define IIG_EXTENDS(cls) 		__attribute__((annotate("extends=" # cls)))
-//#define IIG_INTERFACE  		__attribute__((annotate("interface")))
-//#define IIG_IMPLEMENTS(i)		void __implements(i *);
+                                                                 
+                                                    
 #define IIG_QUEUENAME(name)		__attribute__((annotate("queuename=" # name)))
 #define IIG_SERIALIZABLE		__attribute__((annotate("serializable")))
 
 #if __IIG
 #define KERNEL					IIG_KERNEL
-#endif /* __IIG */
+#endif            
 #define NATIVE					IIG_NATIVE
 #define LOCAL					IIG_LOCAL
 #define LOCALONLY				IIG_LOCALONLY
@@ -89,13 +89,13 @@ typedef OSObject * OSObjectPtr;
 #define PORTCOPYSEND			IIG_PORTCOPYSEND
 #define TARGET					IIG_TARGET
 #define TYPE(p)					IIG_TYPE(p)
-//#define ARRAY(maxcount)		IIG_ARRAY(maxcount)
+                                              
 #define EXTENDS(cls)			IIG_EXTENDS(cls)
-//#define INTERFACE				IIG_INTERFACE
-//#define IMPLEMENTS(i)			IIG_IMPLEMENTS(i)
+                                    
+                                           
 #define QUEUENAME(name)			IIG_QUEUENAME(name)
 
-#else /* __IIG || __DOCUMENTATION__ */
+#else                                 
 
 #define IIG_KERNEL
 #define IIG_NATIVE
@@ -109,27 +109,27 @@ typedef OSObject * OSObjectPtr;
 #define IIG_PORTCOPYSEND
 #define IIG_TARGET
 #define IIG_TYPE(p)
-//#define IIG_ARRAY(maxcount)
+                             
 #define IIG_EXTENDS(cls)
-//#define IIG_INTERFACE
-//#define IIG_IMPLEMENTS(i)
+                       
+                           
 #define IIG_QUEUENAME(name)
 #define IIG_SERIALIZABLE
 
-#endif /* __IIG || __DOCUMENTATION__ */
+#endif                                 
 
-#endif /* __IIG_ATTRIBUTES_DEFINED__ */
+#endif                                 
 
 
 #if !__IIG
 #if KERNEL
 typedef OSObject OSContainer;
-#else /* KERNEL */
+#else             
 class IIG_SERIALIZABLE OSContainer;
-#endif /* KERNEL */
-#else /* !__IIG */
+#endif             
+#else             
 class IIG_SERIALIZABLE OSContainer;
-#endif  /* !__IIG */
+#endif              
 
 class IIG_SERIALIZABLE OSData;
 class IIG_SERIALIZABLE OSNumber;
@@ -157,14 +157,14 @@ class OSMetaClassBase
 	virtual bool
     isEqualTo(const OSMetaClassBase * anObject) const LOCALONLY;
 };
-#endif /* __IIG */
+#endif            
 
 
-/*!
-@iig implementation
-#include <DriverKit/IODispatchQueue.h>
-@iig end
-*/
+   
+                   
+                                      
+        
+  
 
 class OSObject : public OSMetaClassBase
 {
@@ -196,15 +196,15 @@ public:
 #define DEFN(classname, name)                                       \
 name ## _Impl(classname ## _ ## name ## _Args)
 
-/*
- * Use of the IMPL macro is discouraged and should be replaced by a normal c++
- * method implementation (with the all method arguments) and the name of the method
- * given a suffix '_Impl'
- */
+  
+                                                                              
+                                                                                   
+                         
+   
 
 #define IMPL(classname, name)                                       \
 classname :: DEFN(classname, name)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                                                       
 
-#endif /* ! _IOKIT_UOSOBJECT_H */
+#endif                           

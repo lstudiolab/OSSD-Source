@@ -1,5 +1,5 @@
-// To apply, at the top of xnu.git:
-// $ spatch --max-width=120 --use-gitgrep --in-place --include-headers --sp-file tools/cocci/c11_atomic_builtin_rewrite.cocci
+                                   
+                                                                                                                             
 
 @memory_order@
 identifier m =~ "(memory_order_(relaxed|consume|acquire|release|acq_rel|seq_cst)(|_smp)|__ATOMIC_(RELAXED|CONSUME|ACQUIRE|RELEASE|ACQ_REL|SEQ_CST))";
@@ -159,4 +159,4 @@ E
 + F, G, &F, new_m
  )
 
-// vim:ft=diff:
+               

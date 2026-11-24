@@ -26,16 +26,16 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 #if !LIBSYSCALL_INTERFACE && defined(__LP64__)
-/*
- * In an LP64 environment, the traditional Mach VM interface names are
- * really just a second instance of the "wide" Mach VM interfaces.
- *
- * The _MACH_VM_PUBLISH_AS_LOCAL_ flag triggers mach_vm.defs to export
- * the local names instead.
- *
- * LIBSYSCALL_INTERFACE indicates that we are building the
- * machine-independent headers for Libsyscall
- */
+  
+                                                                      
+                                                                  
+  
+                                                                      
+                           
+  
+                                                          
+                                             
+   
 #define _MACH_VM_PUBLISH_AS_LOCAL_
 #include <mach/mach_vm.defs>
 #else

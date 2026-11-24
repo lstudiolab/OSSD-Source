@@ -28,11 +28,11 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- *	File:		clock_types.defs
- *	Purpose:
- *		Clock kernel interface type declarations
- */
+  
+                          
+           
+                                            
+   
 
 #ifndef	_MACH_CLOCK_TYPES_DEFS_
 #define _MACH_CLOCK_TYPES_DEFS_
@@ -44,7 +44,7 @@ type clock_serv_t = mach_port_t
 #if	KERNEL_SERVER
 		intran: clock_serv_t convert_port_to_clock(mach_port_t)
 		outtran: mach_port_t convert_clock_to_port(clock_serv_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type clock_ctrl_t = mach_port_t
@@ -52,7 +52,7 @@ type clock_ctrl_t = mach_port_t
 #if	KERNEL_SERVER
 		intran: clock_ctrl_t convert_port_to_clock_ctrl(mach_port_t)
 		outtran: mach_port_t convert_clock_ctrl_to_port(clock_ctrl_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type clock_reply_t = polymorphic|MACH_MSG_TYPE_MAKE_SEND_ONCE;
@@ -68,6 +68,6 @@ type clock_id_t = int;
 
 import <mach/mach_types.h>;
 
-#endif	/* _MACH_CLOCK_TYPES_DEFS_ */
+#endif	                             
 
-/* vim: set ft=c : */
+                     

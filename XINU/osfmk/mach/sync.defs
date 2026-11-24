@@ -29,18 +29,18 @@
  * @OSF_COPYRIGHT@
  * 
  */
-/*
- *	File: mach/sync.defs
- *	Author: Joseph CaraDonna
- *
- *	Exported kernel calls	
- *
- */
+  
+                       
+                           
+  
+                         
+  
+   
 
 subsystem
 #if	KERNEL_SERVER
 	KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 			sync 617000;
 
 #include <mach/std_types.defs>
@@ -51,7 +51,7 @@ subsystem
 import <kern/sync_lock.h>;
 import <kern/sync_sema.h>;
 import <kern/ipc_sync.h>;
-#endif	/* KERNEL_SERVER */
+#endif	                   
 
 
 type semaphore_t = mach_port_t
@@ -60,7 +60,7 @@ type semaphore_t = mach_port_t
 		intran: semaphore_t convert_port_to_semaphore(mach_port_t)
 		outtran: mach_port_t convert_semaphore_to_port(semaphore_t)
 		destructor: semaphore_dereference(semaphore_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type semaphore_consume_ref_t = mach_port_move_send_t
@@ -68,7 +68,7 @@ type semaphore_consume_ref_t = mach_port_move_send_t
 #if	KERNEL_SERVER
 		intran: semaphore_t convert_port_to_semaphore(mach_port_t)
 		destructor: semaphore_dereference(semaphore_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type lock_set_t = mach_port_t
@@ -77,7 +77,7 @@ type lock_set_t = mach_port_t
 		intran: lock_set_t convert_port_to_lock_set(mach_port_t)
 		outtran: mach_port_t convert_lock_set_to_port(lock_set_t)
 		destructor: lock_set_dereference(lock_set_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 
@@ -142,4 +142,4 @@ routine semaphore_timedwait(
 		semaphore	: semaphore_t;
 		wait_time	: mach_timespec_t);
 
-/* vim: set ft=c : */
+                     

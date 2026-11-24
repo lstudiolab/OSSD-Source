@@ -38,7 +38,7 @@ kextd_kernel_request 77000;
 
 serverprefix svc_;
 
-/* Ping kextd, launchd starts it if it's not running. */
+                                                        
 simpleroutine kextd_ping(
 	server		: mach_port_t
 );

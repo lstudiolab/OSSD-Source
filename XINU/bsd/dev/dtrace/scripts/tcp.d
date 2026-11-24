@@ -25,9 +25,9 @@
 #pragma D depends_on module mach_kernel
 #pragma D depends_on provider tcp
 
-/*
- * TCP flags
- */
+  
+            
+   
 inline int TH_FIN = 0x01;
 #pragma D binding "1.0" TH_FIN
 inline int TH_SYN = 0x02;
@@ -45,9 +45,9 @@ inline int TH_ECE = 0x40;
 inline int TH_CWR = 0x80;
 #pragma D binding "1.0" TH_CWR
 
-/*
- * TCP states
- */
+  
+             
+   
 inline int TCPS_CLOSED = 0;
 #pragma D binding "1.0" TCPS_CLOSED
 inline int TCPS_LISTEN = 1;
@@ -71,9 +71,9 @@ inline int TCPS_FIN_WAIT_2 = 9;
 inline int TCPS_TIME_WAIT = 10;
 #pragma D binding "1.0" TCPS_TIME_WAIT
 
-/*
- * TCP congestion control events
- */
+  
+                                
+   
 inline int TCP_CC_CWND_INIT = 0;
 #pragma D binding "1.0" TCP_CC_CWND_INIT
 inline int TCP_CC_INSEQ_ACK_RCVD = 1;
@@ -110,20 +110,20 @@ inline int TCP_CC_EARLY_RETRANSMIT = 16;
 #pragma D binding "1.0" TCP_CC_EARLY_RETRANSMIT
 
 
-/*
- * tcpinfo is the TCP header field
- */
+  
+                                  
+   
 typedef struct tcpinfo {
-	uint16_t tcp_sport;	/* source port */
-	uint16_t tcp_dport;	/* destination port */
-	uint32_t tcp_seq;	/* sequence number */
-	uint32_t tcp_ack;	/* acknowledgement number */
-	uint8_t tcp_offset;	/* data offset, in bytes */
-	uint8_t tcp_flags;	/* flags */
-	uint16_t tcp_window;	/* window size */
-	uint16_t tcp_checksum;	/* checksum */
-	uint16_t tcp_urgent;	/* urgent data pointer */
-	struct tcphdr *tcp_hdr;	/* raw TCP header */
+	uint16_t tcp_sport;	                 
+	uint16_t tcp_dport;	                      
+	uint32_t tcp_seq;	                     
+	uint32_t tcp_ack;	                            
+	uint8_t tcp_offset;	                           
+	uint8_t tcp_flags;	           
+	uint16_t tcp_window;	                 
+	uint16_t tcp_checksum;	              
+	uint16_t tcp_urgent;	                         
+	struct tcphdr *tcp_hdr;	                    
 } tcpinfo_t;
 
 #pragma D binding "1.0" translator
@@ -140,35 +140,35 @@ translator tcpinfo_t < struct tcphdr *T > {
 	tcp_hdr = T;
 };
 
-/*
- * tcpsinfo contains stable TCP details from TCP control block
- */
+  
+                                                              
+   
 typedef struct tcpsinfo {
-	int tcps_local;		/* is delivered locally, boolean */
-	int tcps_active;	/* active open, boolean */
-	string tcps_state;	/* TCP state, as a string */
-	u_int t_flags;		/* flags */
-	uint32_t rcv_nxt;	/* receive next */
-	uint32_t rcv_adv;	/* advertised window */
-	uint32_t rcv_wnd;	/* receive window */
-	uint32_t snd_wnd;	/* send window */
-	uint32_t snd_cwnd;	/* congestion controlled window */
-	uint32_t snd_ssthresh;	/* slow-start threshold */
-	uint32_t snd_una;	/* send unacknowledged */
-	uint32_t snd_nxt;	/* send next */
-	uint32_t snd_max;	/* send max */
-	uint32_t snd_recover;	/* send recover for NewReno */
-	int	t_rxtcur;	/* retransmit timeout in ms */
-	u_int	t_maxseg;	/* maximum segment size */
-	u_int	t_rttbest;	/* best rtt we have seen */
-	int	rcv_numsacks;	/* number of sack blocks present */
-	int	snd_numholes;	/* number of holes seen by sender */
-	struct tcpcb* tcpcb;	/* Pointer to tcp control block */
+	int tcps_local;		                                   
+	int tcps_active;	                          
+	string tcps_state;	                            
+	u_int t_flags;		           
+	uint32_t rcv_nxt;	                  
+	uint32_t rcv_adv;	                       
+	uint32_t rcv_wnd;	                    
+	uint32_t snd_wnd;	                 
+	uint32_t snd_cwnd;	                                  
+	uint32_t snd_ssthresh;	                          
+	uint32_t snd_una;	                         
+	uint32_t snd_nxt;	               
+	uint32_t snd_max;	              
+	uint32_t snd_recover;	                              
+	int	t_rxtcur;	                              
+	u_int	t_maxseg;	                          
+	u_int	t_rttbest;	                           
+	int	rcv_numsacks;	                                   
+	int	snd_numholes;	                                    
+	struct tcpcb* tcpcb;	                                  
 } tcpsinfo_t;
 
 #pragma D binding "1.0" translator
 translator tcpsinfo_t < struct tcpcb *T> {
-	tcps_local = 0;		/* Not used */
+	tcps_local = 0;		              
 	tcps_active = 0;
 	tcps_state = T ? 
 		T->t_state == TCPS_CLOSED ? "state-closed" :
@@ -202,11 +202,11 @@ translator tcpsinfo_t < struct tcpcb *T> {
 	tcpcb = T;
 };
 
-/*
- * tcpnsinfo provides the new tcp state for state changes.
- */
+  
+                                                          
+   
 typedef struct tcpnsinfo {
-	string tcps_state;	/* TCP state, as a string */
+	string tcps_state;	                            
 } tcpnsinfo_t;
 
 #pragma D binding "1.0" translator
@@ -225,11 +225,11 @@ translator tcpnsinfo_t < int32_t I > {
 		"<unknown>" : "state-closed";
 };
 
-/* 
- * tcpccevent provides the congestion control event for TCP cc probes
- */
+   
+                                                                     
+   
 typedef struct tcpccevent {
-	string tcp_cc;		/* TCP congestion control event, as a string */
+	string tcp_cc;		                                               
 } tcpccevent_t;
 
 #pragma D binding "1.0" translator

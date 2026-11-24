@@ -53,19 +53,19 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/mach_port.defs
- *	Author:	Rich Draves
- *
- *	Exported kernel calls.
- */
+  
+   
+  
+                            
+                      
+  
+                         
+   
 
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 	  task 3400;
 
 #include <mach/std_types.defs>
@@ -78,30 +78,30 @@ subsystem
 #define PREFIX(NAME) NAME
 #endif
 
-/*
- *	Create a new task with an empty set of IPC rights,
- *	and having an address space constructed from the
- *	target task (or empty, if inherit_memory is FALSE).
- */
+  
+                                                     
+                                                   
+                                                      
+   
 routine task_create(
 		target_task	: task_t;
 		ledgers		: ledger_array_t;
 		inherit_memory	: boolean_t;
 	out	child_task	: task_t);
 
-/*
- *	Destroy the target task, causing all of its threads
- *	to be destroyed, all of its IPC rights to be deallocated,
- *	and all of its address space to be deallocated.
- */
+  
+                                                      
+                                                            
+                                                  
+   
 routine task_terminate(
 		target_task	: task_t);
 
-/*
- *	Returns the set of threads belonging to the target task.
- *  [Polymorphic] This routine returns thread port with the same 
- *  flavor as that of the task port passed in.
- */
+  
+                                                           
+                                                                 
+                                              
+   
 routine
 #ifdef KERNEL_SERVER
 task_threads_from_user(
@@ -113,26 +113,26 @@ task_threads(
 	out	act_list	: thread_act_array_t);
 
 
-/*
- *	Stash a handful of ports for the target task; child
- *	tasks inherit this stash at task_create time.
- */
+  
+                                                      
+                                                
+   
 routine	mach_ports_register(
 		target_task	: task_t;
 		init_port_set	: mach_port_array_t =
 					^array[] of mach_port_t);
 
-/*
- *	Retrieve the stashed ports for the target task.
- */
+  
+                                                  
+   
 routine	mach_ports_lookup(
 		target_task	: task_t;
 	out	init_port_set	: mach_port_array_t =
 					^array[] of mach_port_t);
 
-/*
- *      Returns information about the target task.
- */
+  
+                                                  
+   
 #ifdef KERNEL_SERVER
 routine task_info_from_user(
                 target_task     : mach_port_t;
@@ -145,36 +145,36 @@ routine task_info(
         out     task_info_out   : task_info_t, CountInOut);
 
 #endif
-/*
- * Set task information.
- */
+  
+                        
+   
 routine	task_set_info(
 		target_task	: task_t;
 		flavor		: task_flavor_t;
 		task_info_in	: task_info_t);
 
-/*
- *	Increment the suspend count for the target task.
- *	No threads within a task may run when the suspend
- *	count for that task is non-zero.
- */
+  
+                                                   
+                                                    
+                                   
+   
 routine	task_suspend(
 		target_task	: task_read_t);
 
 
-/*
- *	Decrement the suspend count for the target task,
- *	if the count is currently non-zero.  If the resulting
- *	suspend	count is zero, then threads within the task
- *	that also have non-zero suspend counts may execute.
- */
+  
+                                                   
+                                                        
+                                                      
+                                                      
+   
 routine	task_resume(
 		target_task	: task_read_t);
 
-/*
- *	Returns the current value of the selected special port
- *	associated with the target task.
- */
+  
+                                                         
+                                   
+   
 routine
 #ifdef KERNEL_SERVER
 task_get_special_port_from_user(
@@ -187,20 +187,20 @@ task_get_special_port(
 	out	special_port	: mach_port_t);
 
 
-/*
- *	Set one of the special ports associated with the
- *	target task.
- */
+  
+                                                   
+               
+   
 routine task_set_special_port(
 		task		: task_t;
 		which_port	: int;
 		special_port	: mach_port_t);
 
-/*
- *	Create a new thread within the target task, returning
- *	the port representing the first thr_act in that new thread.  The
- *	initial execution state of the thread is undefined.
- */
+  
+                                                        
+                                                                   
+                                                      
+   
 routine
 #ifdef KERNEL_SERVER
 thread_create_from_user(
@@ -210,13 +210,13 @@ thread_create(
 		parent_task	: task_t;
 	out	child_act	: thread_act_t);
 
-/*
- *      Create a new thread within the target task, returning
- *      the port representing that new thread.  The new thread 
- *	is not suspended; its initial execution state is given
- *	by flavor and new_state. Returns the port representing 
- *	the new thread.
- */
+  
+                                                             
+                                                               
+                                                         
+                                                          
+                  
+   
 routine
 #ifdef KERNEL_SERVER
 thread_create_running_from_user(
@@ -228,12 +228,12 @@ thread_create_running(
                 new_state       : thread_state_t;
         out     child_act       : thread_act_t);
 
-/*
- * Set an exception handler for a task on one or more exception types.
- * These handlers are invoked for all threads in the task if there are
- * no thread-specific exception handlers or those handlers returned an
- * error.
- */
+  
+                                                                      
+                                                                      
+                                                                      
+         
+   
 routine	task_set_exception_ports(
 		task		: task_t;
 		exception_mask	: exception_mask_t;
@@ -242,9 +242,9 @@ routine	task_set_exception_ports(
 		new_flavor	: thread_state_flavor_t);
 
 
-/*
- * Lookup some of the old exception handlers for a task
- */
+  
+                                                       
+   
 routine
 #if KERNEL_SERVER
 task_get_exception_ports_from_user(
@@ -260,11 +260,11 @@ task_get_exception_ports(
 	  out	old_flavors	: exception_flavor_array_t, SameCount);
 
 
-/*
- * Set an exception handler for a thread on one or more exception types.
- * At the same time, return the previously defined exception handlers for
- * those types.
- */
+  
+                                                                        
+                                                                         
+               
+   
 routine	task_swap_exception_ports(
 		task		: task_t;
 		exception_mask	: exception_mask_t;
@@ -276,26 +276,26 @@ routine	task_swap_exception_ports(
 	  out	old_behaviors	: exception_behavior_array_t, SameCount;
 	  out	old_flavors	: exception_flavor_array_t, SameCount);
 
-/*
- * OBSOLETE interface.
- */
+  
+                      
+   
 routine lock_set_create(
 		task		: task_t;
 	out	new_lock_set	: lock_set_t;
 		n_ulocks	: int;
 		policy		: int);
 
-/*
- * OBSOLETE interface.
- */
+  
+                      
+   
 routine lock_set_destroy(
 		task		: task_t;
 		lock_set	: lock_set_t);
 
-/*
- * Create and destroy semaphore synchronizers on a
- * per-task basis (i.e. the task owns them).
- */
+  
+                                                  
+                                            
+   
 
 routine semaphore_create(
 		task		: task_t;
@@ -307,10 +307,10 @@ routine semaphore_destroy(
 		task		: task_t;
 		semaphore	: semaphore_consume_ref_t);
 
-/*
- * Set/get policy information for a task.
- * (Approved Mac OS X microkernel interface)
- */
+  
+                                         
+                                            
+   
 
 routine task_policy_set(
 	task			: task_policy_set_t;
@@ -323,9 +323,9 @@ routine task_policy_get(
 out	policy_info		: task_policy_t, CountInOut;
 inout	get_default		: boolean_t);
 
-/*
- *	Removed from the kernel.
- */
+  
+                           
+   
 #if KERNEL_SERVER
 skip;
 #else
@@ -334,12 +334,12 @@ routine task_sample(
 		reply		: mach_port_make_send_t);
 #endif
 
-/*
- * JMM - Everything from here down is likely to go away soon
- */
-/*
- * OBSOLETE interface.
- */
+  
+                                                            
+   
+  
+                      
+   
 routine task_policy(
 	task			: task_t;
 	policy			: policy_t;
@@ -348,47 +348,47 @@ routine task_policy(
 	change			: boolean_t);
 
 
-/*
- *	Establish a user-level handler for the specified
- *	system call.
- */
+  
+                                                   
+               
+   
 routine task_set_emulation(
 		target_port	: task_t;
 		routine_entry_pt: vm_address_t;
 		routine_number  : int);	
 
-/*
- *	Get user-level handler entry points for all
- *	emulated system calls.
- */
+  
+                                              
+                         
+   
 routine task_get_emulation_vector(
 		task		: task_t;
 	out	vector_start	: int;
 	out	emulation_vector: emulation_vector_t);
 
-/*
- *	Establish user-level handlers for the specified
- *	system calls. Non-emulated system calls are specified
- *	with emulation_vector[i] == EML_ROUTINE_NULL.
- */
+  
+                                                  
+                                                        
+                                                
+   
 routine task_set_emulation_vector(
 		task		: task_t;
 		vector_start	: int;
 		emulation_vector: emulation_vector_t);
 
 
-/*
- *      Establish restart pc for interrupted atomic sequences.
- */
+  
+                                                              
+   
 routine task_set_ras_pc(
 		target_task     : task_t;
 		basepc          : vm_address_t;
 		boundspc        : vm_address_t);
 
 
-/*
- * Return zone info as seen/used by this task.
- */
+  
+                                              
+   
 routine task_zone_info(
 		target_task	: task_inspect_t;
 	out	names		: mach_zone_name_array_t,
@@ -397,35 +397,35 @@ routine task_zone_info(
 					Dealloc);
 
 
-/* 
- * JMM - Want to eliminate processor_set so keep them at the end.
- */
+   
+                                                                 
+   
 
-/*
- *	Assign task to processor set.
- */
+  
+                                
+   
 routine task_assign(
 		task		: task_t;
 		new_set		: processor_set_t;
 		assign_threads	: boolean_t);
 
-/*
- *	Assign task to default set.
- */
+  
+                              
+   
 routine task_assign_default(
 		task		: task_t;
 		assign_threads	: boolean_t);
 
-/*
- *	Get current assignment for task.
- */
+  
+                                   
+   
 routine task_get_assignment(
 		task		: task_inspect_t;
 	out	assigned_set	: processor_set_name_t);
 
-/*
- * OBSOLETE interface.
- */
+  
+                      
+   
 routine task_set_policy(
 	task			: task_t;
 	pset			: processor_set_t;
@@ -434,27 +434,27 @@ routine task_set_policy(
 	limit			: policy_limit_t;
 	change			: boolean_t);
 
-/*
- * Read the selected state which is to be installed on new 
- * threads in the task as they are created.
- */
+  
+                                                           
+                                           
+   
 routine task_get_state(
 		task		: task_read_t;
 		flavor		: thread_state_flavor_t;
 	out	old_state	: thread_state_t, CountInOut);
  
-/*
- * Set the selected state information to be installed on
- * all subsequently created threads in the task.
- */
+  
+                                                        
+                                                
+   
 routine	task_set_state(
 		task		: task_t;
 		flavor		: thread_state_flavor_t;
 		new_state	: thread_state_t);
 
-/*
- * Change the task's physical footprint limit (in MB).
- */
+  
+                                                      
+   
 routine task_set_phys_footprint_limit(
 		task		: task_t;
 		new_limit	: int;
@@ -551,7 +551,7 @@ routine PREFIX(mach_task_is_self)(
 		task     : task_name_t;
 	out is_self  : boolean_t);
 #else
-	/* Do not generate header, use the one in mach_init.h */
+	                                                        
 	skip;
 #endif
 
@@ -580,5 +580,5 @@ routine task_get_exception_ports_info(
 	out	old_behaviors	: exception_behavior_array_t, SameCount;
 	out	old_flavors	: exception_flavor_array_t, SameCount);
 	
-/* vim: set ft=c : */
+                     
 

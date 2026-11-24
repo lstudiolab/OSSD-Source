@@ -53,31 +53,31 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/mach_port.defs
- *	Author:	Rich Draves
- *
- *	Exported kernel calls.
- */
+  
+   
+  
+                            
+                      
+  
+                         
+   
 
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 	  processor 3000;
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 
-/*
- * References to processor objects are returned by:
- *	host_processors(host_priv_t,...);
- */
-/*
- *	Start processor.
- */
+  
+                                                   
+                                    
+   
+  
+                   
+   
 
 #ifdef KERNEL_SERVER
 routine	processor_start_from_user(
@@ -87,9 +87,9 @@ routine	processor_start(
 		processor	: processor_t);
 #endif
 
-/*
- *	Exit processor -- may not be restartable.
- */
+  
+                                            
+   
 
 #ifdef KERNEL_SERVER
 routine	processor_exit_from_user(
@@ -99,9 +99,9 @@ routine	processor_exit(
 		processor	: processor_t);
 #endif
 
-/*
- *	Return information about this processor.
- */
+  
+                                           
+   
 routine processor_info(
 		processor	: processor_t;
 		flavor		: processor_flavor_t;
@@ -109,31 +109,31 @@ routine processor_info(
 	out	processor_info_out: processor_info_t, CountInOut);
 
 
-/*
- *	Do something machine-dependent to processor.
- */
+  
+                                               
+   
 routine processor_control(
 		processor	: processor_t;
 		processor_cmd	: processor_info_t);
 
-/*
- * JMM - Keep processor_set related stuff at the end because
- * they likely will be removed.
- */
+  
+                                                            
+                               
+   
 
-/*
- *	Assign processor to processor set.
- */
+  
+                                     
+   
 routine processor_assign(
 		processor	: processor_t;
 		new_set		: processor_set_t;
 		wait		: boolean_t);
 
-/*
- *	Get current assignment for processor.
- */
+  
+                                        
+   
 routine processor_get_assignment(
 		processor	: processor_t;
 	out	assigned_set	: processor_set_name_t);
 
-/* vim: set ft=c : */
+                     

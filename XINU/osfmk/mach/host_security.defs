@@ -53,31 +53,31 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- * File:	mach/host_security.defs
- *
- * Abstract:
- *	Mach host security operations support.
- */
+  
+                                
+  
+            
+                                         
+   
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		      host_security 600;
 
-/*
- *	Basic types
- */
+  
+              
+   
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 
 
-/*
- *	Create a new task with an explicit security token
- */
+  
+                                                    
+   
 routine host_security_create_task_token(
 		host_security	: host_security_t;
 		parent_task	: task_t;
@@ -88,9 +88,9 @@ routine host_security_create_task_token(
 		inherit_memory	: boolean_t;
 	out	child_task	: task_t);
 
-/*
- *	Change a task's security token
- */
+  
+                                 
+   
 routine host_security_set_task_token(
 		host_security	: host_security_t;
 		target_task	: task_t;
@@ -98,4 +98,4 @@ routine host_security_set_task_token(
 		audit_token	: audit_token_t;
 		host		: host_t);
 
-/* vim: set ft=c : */
+                     

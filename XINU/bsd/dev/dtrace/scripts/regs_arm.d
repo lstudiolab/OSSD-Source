@@ -36,7 +36,7 @@ inline int R_R14 = 14;
 inline int R_R15 = 15;
 #pragma D binding "1.0" R_R15
 
-/* Apple-specific ABI to use R7 as the framepointer */
+                                                      
 inline int R_FP = R_R7;
 #pragma D binding "1.0" R_FP
 

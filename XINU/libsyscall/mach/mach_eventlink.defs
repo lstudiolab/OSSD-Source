@@ -28,16 +28,16 @@
 
 import <mach/mach_eventlink_types.h>;
 
-/*
- * Libsyscall mach_eventlink.defs should include mach/mach_eventlink.defs exported by
- * kernel, putting a copy of the file instead to avoid the build failure due to
- * ordering issues. Once the mach/mach_eventlink.defs is in build, replace the content
- * on defs file with #inlude <mach/mach_eventlink.defs>.
- */
+  
+                                                                                     
+                                                                               
+                                                                                      
+                                                        
+   
 subsystem
 #if	KERNEL_SERVER
 	KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 			mach_eventlink 716200;
 
 #include <mach/std_types.defs>
@@ -52,7 +52,7 @@ type eventlink_t = mach_port_t
 #if	KERNEL_SERVER
 		intran: ipc_eventlink_t convert_port_to_eventlink(mach_port_t)
 		destructor: ipc_eventlink_deallocate(ipc_eventlink_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type eventlink_consume_ref_t = mach_port_move_send_t
@@ -60,7 +60,7 @@ type eventlink_consume_ref_t = mach_port_move_send_t
 #if	KERNEL_SERVER
 		intran: ipc_eventlink_t convert_port_to_eventlink(mach_port_t)
 		destructor: ipc_eventlink_deallocate(ipc_eventlink_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type eventlink_port_pair_t = array[2] of mach_port_t;
@@ -69,7 +69,7 @@ type mach_eventlink_associate_option_t = uint32_t;
 type mach_eventlink_disassociate_option_t = uint32_t;
 type mach_eventlink_signal_wait_option_t = uint32_t;
 
-#endif /* _MACH_MACH_EVENTLINK_TYPE_DEFS */
+#endif                                     
 
 routine mach_eventlink_create(
 		task             : task_t;
@@ -93,4 +93,4 @@ routine mach_eventlink_disassociate(
 		eventlink        : eventlink_t;
 		option           : mach_eventlink_disassociate_option_t);
 
- /* vim: set ft=c : */
+                      

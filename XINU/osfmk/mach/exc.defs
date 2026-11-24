@@ -53,17 +53,17 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- * Abstract:
- *	MiG definitions file for Mach exception interface.
- */
+  
+   
+  
+            
+                                                     
+   
 
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 
 #if	KERNEL_USER
 	  KernelUser
@@ -130,4 +130,4 @@ routine		exception_raise_state_identity(
 #endif
 			);
 
-/* vim: set ft=c : */
+                     

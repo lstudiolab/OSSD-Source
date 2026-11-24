@@ -48,7 +48,7 @@ END(___syscall)
                                                           
                                                                   
                      
-__SYSCALL(___syscall, syscall, 0) 
+__SYSCALL(___syscall, syscall, 0);
 
 #elif defined(__arm__)
 

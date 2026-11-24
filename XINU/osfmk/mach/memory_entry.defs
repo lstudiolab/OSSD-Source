@@ -29,7 +29,7 @@
 subsystem
 #if KERNEL_SERVER
     KernelServer
-#endif /* KERNEL_SERVER */
+#endif                    
        memory_entry 4900;
 
 #include <mach/std_types.defs>

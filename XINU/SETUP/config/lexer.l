@@ -39,9 +39,9 @@ int	yylex(void);
 
 #define tprintf if (do_trace) printf
 
-/*
- * Key word table
- */
+  
+                 
+   
 
 struct kt {
 	const char *kt_name;

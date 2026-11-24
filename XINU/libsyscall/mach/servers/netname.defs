@@ -32,19 +32,19 @@
  * the terms and conditions for use and redistribution.
  */
 
-/*
- * Mig definitions for Network Name Service.
- */
+  
+                                            
+   
 
-/*
- * HISTORY:
- * 30-May-87  Robert Sansom (rds) at Carnegie Mellon University
- *	Changes for the new mig.
- *
- * 20-Oct-86  Robert Sansom (rds) at Carnegie Mellon University
- *	New network name service interface.
- *	Added a serverprefix.
- */
+  
+           
+                                                               
+                           
+  
+                                                               
+                                      
+                        
+   
 
 #include <mach/std_types.defs>
 

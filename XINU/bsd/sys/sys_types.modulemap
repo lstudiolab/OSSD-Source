@@ -1,7 +1,7 @@
-// Module map for sys/types.h and some of sys/_types/.
-//
-// See also: module.modulemap
-// See also: sys__types.modulemap (part of Darwin_C_stdint).
+                                                      
+  
+                             
+                                                            
 
 module Darwin.POSIX.sys.types {
         export *
@@ -9,7 +9,7 @@ module Darwin.POSIX.sys.types {
         header "sys/types.h"
         umbrella "sys/_types"
 
-        // See sys__types.modulemap.
+                                    
         exclude header "sys/_types/_int16_t.h"
         exclude header "sys/_types/_int32_t.h"
         exclude header "sys/_types/_int64_t.h"

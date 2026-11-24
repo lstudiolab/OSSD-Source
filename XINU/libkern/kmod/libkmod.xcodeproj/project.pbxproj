@@ -1,4 +1,4 @@
-// !$*UTF8*$!
+             
 {
 	archiveVersion = 1;
 	classes = {
@@ -6,216 +6,216 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		C61E2D9512F3647000FC9BCA /* All */ = {
+                                      
+		C61E2D9512F3647000FC9BCA           = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = C61E2D9612F3647000FC9BCA /* Build configuration list for PBXAggregateTarget "All" */;
+			buildConfigurationList = C61E2D9612F3647000FC9BCA                                                            ;
 			buildPhases = (
 			);
 			dependencies = (
-				C61E2D9912F364A800FC9BCA /* PBXTargetDependency */,
-				C61E2DA212F3650100FC9BCA /* PBXTargetDependency */,
+				C61E2D9912F364A800FC9BCA                          ,
+				C61E2DA212F3650100FC9BCA                          ,
 			);
 			name = All;
 			productName = All;
 		};
-/* End PBXAggregateTarget section */
+                                    
 
-/* Begin PBXBuildFile section */
-		C61E2D8012F360A200FC9BCA /* libkmodtest.h in Headers */ = {isa = PBXBuildFile; fileRef = C61E2D7F12F360A200FC9BCA /* libkmodtest.h */; };
-		C61E2D8212F360A200FC9BCA /* libkmodtest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C61E2D8112F360A200FC9BCA /* libkmodtest.cpp */; };
-		C61E2DAC12F3661900FC9BCA /* README in Resources */ = {isa = PBXBuildFile; fileRef = C61E2DA712F3661900FC9BCA /* README */; };
-		C61E2DAD12F3672F00FC9BCA /* c_start.c in Sources */ = {isa = PBXBuildFile; fileRef = C61E2DA312F3661900FC9BCA /* c_start.c */; };
-		C61E2DAE12F3672F00FC9BCA /* c_stop.c in Sources */ = {isa = PBXBuildFile; fileRef = C61E2DA412F3661900FC9BCA /* c_stop.c */; };
-		C61E2DAF12F3673A00FC9BCA /* cplus_start.c in Sources */ = {isa = PBXBuildFile; fileRef = C61E2DA512F3661900FC9BCA /* cplus_start.c */; };
-		C61E2DB012F3673A00FC9BCA /* cplus_stop.c in Sources */ = {isa = PBXBuildFile; fileRef = C61E2DA612F3661900FC9BCA /* cplus_stop.c */; };
-/* End PBXBuildFile section */
+                                
+		C61E2D8012F360A200FC9BCA                                = {isa = PBXBuildFile; fileRef = C61E2D7F12F360A200FC9BCA                    ; };
+		C61E2D8212F360A200FC9BCA                                  = {isa = PBXBuildFile; fileRef = C61E2D8112F360A200FC9BCA                      ; };
+		C61E2DAC12F3661900FC9BCA                           = {isa = PBXBuildFile; fileRef = C61E2DA712F3661900FC9BCA             ; };
+		C61E2DAD12F3672F00FC9BCA                            = {isa = PBXBuildFile; fileRef = C61E2DA312F3661900FC9BCA                ; };
+		C61E2DAE12F3672F00FC9BCA                           = {isa = PBXBuildFile; fileRef = C61E2DA412F3661900FC9BCA               ; };
+		C61E2DAF12F3673A00FC9BCA                                = {isa = PBXBuildFile; fileRef = C61E2DA512F3661900FC9BCA                    ; };
+		C61E2DB012F3673A00FC9BCA                               = {isa = PBXBuildFile; fileRef = C61E2DA612F3661900FC9BCA                   ; };
+                              
 
-/* Begin PBXContainerItemProxy section */
-		C61E2D9812F364A800FC9BCA /* PBXContainerItemProxy */ = {
+                                         
+		C61E2D9812F364A800FC9BCA                             = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C61E2D6012F3605700FC9BCA /* Project object */;
+			containerPortal = C61E2D6012F3605700FC9BCA                     ;
 			proxyType = 1;
 			remoteGlobalIDString = C61E2D9112F3642100FC9BCA;
 			remoteInfo = libkmod;
 		};
-		C61E2DA112F3650100FC9BCA /* PBXContainerItemProxy */ = {
+		C61E2DA112F3650100FC9BCA                             = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C61E2D6012F3605700FC9BCA /* Project object */;
+			containerPortal = C61E2D6012F3605700FC9BCA                     ;
 			proxyType = 1;
 			remoteGlobalIDString = C61E2D9D12F364C100FC9BCA;
 			remoteInfo = "libkmodc++";
 		};
-		C61E2DB112F36AC700FC9BCA /* PBXContainerItemProxy */ = {
+		C61E2DB112F36AC700FC9BCA                             = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C61E2D6012F3605700FC9BCA /* Project object */;
+			containerPortal = C61E2D6012F3605700FC9BCA                     ;
 			proxyType = 1;
 			remoteGlobalIDString = C61E2D9112F3642100FC9BCA;
 			remoteInfo = libkmod;
 		};
-		C61E2DB312F36ACB00FC9BCA /* PBXContainerItemProxy */ = {
+		C61E2DB312F36ACB00FC9BCA                             = {
 			isa = PBXContainerItemProxy;
-			containerPortal = C61E2D6012F3605700FC9BCA /* Project object */;
+			containerPortal = C61E2D6012F3605700FC9BCA                     ;
 			proxyType = 1;
 			remoteGlobalIDString = C61E2D9D12F364C100FC9BCA;
 			remoteInfo = "libkmodc++";
 		};
-/* End PBXContainerItemProxy section */
+                                       
 
-/* Begin PBXFileReference section */
-		C61E2D7312F360A200FC9BCA /* libkmodtest.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libkmodtest.kext; sourceTree = BUILT_PRODUCTS_DIR; };
-		C61E2D7712F360A200FC9BCA /* Kernel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kernel.framework; path = System/Library/Frameworks/Kernel.framework; sourceTree = SDKROOT; };
-		C61E2D7A12F360A200FC9BCA /* libkmodtest-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "libkmodtest-Info.plist"; sourceTree = "<group>"; };
-		C61E2D7F12F360A200FC9BCA /* libkmodtest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libkmodtest.h; sourceTree = "<group>"; };
-		C61E2D8112F360A200FC9BCA /* libkmodtest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = libkmodtest.cpp; sourceTree = "<group>"; };
-		C61E2D9212F3642100FC9BCA /* libkmod.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libkmod.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		C61E2D9E12F364C100FC9BCA /* libkmodc++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libkmodc++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C61E2DA312F3661900FC9BCA /* c_start.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = c_start.c; sourceTree = "<group>"; };
-		C61E2DA412F3661900FC9BCA /* c_stop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = c_stop.c; sourceTree = "<group>"; };
-		C61E2DA512F3661900FC9BCA /* cplus_start.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cplus_start.c; sourceTree = "<group>"; };
-		C61E2DA612F3661900FC9BCA /* cplus_stop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cplus_stop.c; sourceTree = "<group>"; };
-		C61E2DA712F3661900FC9BCA /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-/* End PBXFileReference section */
+                                    
+		C61E2D7312F360A200FC9BCA                        = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libkmodtest.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		C61E2D7712F360A200FC9BCA                        = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kernel.framework; path = System/Library/Frameworks/Kernel.framework; sourceTree = SDKROOT; };
+		C61E2D7A12F360A200FC9BCA                              = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "libkmodtest-Info.plist"; sourceTree = "<group>"; };
+		C61E2D7F12F360A200FC9BCA                     = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libkmodtest.h; sourceTree = "<group>"; };
+		C61E2D8112F360A200FC9BCA                       = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = libkmodtest.cpp; sourceTree = "<group>"; };
+		C61E2D9212F3642100FC9BCA                 = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libkmod.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C61E2D9E12F364C100FC9BCA                    = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libkmodc++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C61E2DA312F3661900FC9BCA                 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = c_start.c; sourceTree = "<group>"; };
+		C61E2DA412F3661900FC9BCA                = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = c_stop.c; sourceTree = "<group>"; };
+		C61E2DA512F3661900FC9BCA                     = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cplus_start.c; sourceTree = "<group>"; };
+		C61E2DA612F3661900FC9BCA                    = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cplus_stop.c; sourceTree = "<group>"; };
+		C61E2DA712F3661900FC9BCA              = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+                                  
 
-/* Begin PBXFrameworksBuildPhase section */
-		C61E2D6E12F360A200FC9BCA /* Frameworks */ = {
+                                           
+		C61E2D6E12F360A200FC9BCA                  = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C61E2D8F12F3642100FC9BCA /* Frameworks */ = {
+		C61E2D8F12F3642100FC9BCA                  = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C61E2D9B12F364C100FC9BCA /* Frameworks */ = {
+		C61E2D9B12F364C100FC9BCA                  = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXFrameworksBuildPhase section */
+                                         
 
-/* Begin PBXGroup section */
+                            
 		C61E2D5E12F3605700FC9BCA = {
 			isa = PBXGroup;
 			children = (
-				C61E2DA312F3661900FC9BCA /* c_start.c */,
-				C61E2DA412F3661900FC9BCA /* c_stop.c */,
-				C61E2DA512F3661900FC9BCA /* cplus_start.c */,
-				C61E2DA612F3661900FC9BCA /* cplus_stop.c */,
-				C61E2DA712F3661900FC9BCA /* README */,
-				C61E2D7812F360A200FC9BCA /* libkmodtest */,
-				C61E2D7512F360A200FC9BCA /* Frameworks */,
-				C61E2D7412F360A200FC9BCA /* Products */,
+				C61E2DA312F3661900FC9BCA                ,
+				C61E2DA412F3661900FC9BCA               ,
+				C61E2DA512F3661900FC9BCA                    ,
+				C61E2DA612F3661900FC9BCA                   ,
+				C61E2DA712F3661900FC9BCA             ,
+				C61E2D7812F360A200FC9BCA                  ,
+				C61E2D7512F360A200FC9BCA                 ,
+				C61E2D7412F360A200FC9BCA               ,
 			);
 			sourceTree = "<group>";
 		};
-		C61E2D7412F360A200FC9BCA /* Products */ = {
+		C61E2D7412F360A200FC9BCA                = {
 			isa = PBXGroup;
 			children = (
-				C61E2D7312F360A200FC9BCA /* libkmodtest.kext */,
-				C61E2D9212F3642100FC9BCA /* libkmod.a */,
-				C61E2D9E12F364C100FC9BCA /* libkmodc++.a */,
+				C61E2D7312F360A200FC9BCA                       ,
+				C61E2D9212F3642100FC9BCA                ,
+				C61E2D9E12F364C100FC9BCA                   ,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C61E2D7512F360A200FC9BCA /* Frameworks */ = {
+		C61E2D7512F360A200FC9BCA                  = {
 			isa = PBXGroup;
 			children = (
-				C61E2D7612F360A200FC9BCA /* Other Frameworks */,
+				C61E2D7612F360A200FC9BCA                       ,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		C61E2D7612F360A200FC9BCA /* Other Frameworks */ = {
+		C61E2D7612F360A200FC9BCA                        = {
 			isa = PBXGroup;
 			children = (
-				C61E2D7712F360A200FC9BCA /* Kernel.framework */,
+				C61E2D7712F360A200FC9BCA                       ,
 			);
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		C61E2D7812F360A200FC9BCA /* libkmodtest */ = {
+		C61E2D7812F360A200FC9BCA                   = {
 			isa = PBXGroup;
 			children = (
-				C61E2D7F12F360A200FC9BCA /* libkmodtest.h */,
-				C61E2D8112F360A200FC9BCA /* libkmodtest.cpp */,
-				C61E2D7912F360A200FC9BCA /* Supporting Files */,
+				C61E2D7F12F360A200FC9BCA                    ,
+				C61E2D8112F360A200FC9BCA                      ,
+				C61E2D7912F360A200FC9BCA                       ,
 			);
 			path = libkmodtest;
 			sourceTree = "<group>";
 		};
-		C61E2D7912F360A200FC9BCA /* Supporting Files */ = {
+		C61E2D7912F360A200FC9BCA                        = {
 			isa = PBXGroup;
 			children = (
-				C61E2D7A12F360A200FC9BCA /* libkmodtest-Info.plist */,
+				C61E2D7A12F360A200FC9BCA                             ,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-/* End PBXGroup section */
+                          
 
-/* Begin PBXHeadersBuildPhase section */
-		C61E2D6F12F360A200FC9BCA /* Headers */ = {
+                                        
+		C61E2D6F12F360A200FC9BCA               = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C61E2D8012F360A200FC9BCA /* libkmodtest.h in Headers */,
+				C61E2D8012F360A200FC9BCA                               ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C61E2D9012F3642100FC9BCA /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C61E2D9C12F364C100FC9BCA /* Headers */ = {
+		C61E2D9012F3642100FC9BCA               = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXHeadersBuildPhase section */
+		C61E2D9C12F364C100FC9BCA               = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+                                      
 
-/* Begin PBXNativeTarget section */
-		C61E2D7212F360A200FC9BCA /* libkmodtest */ = {
+                                   
+		C61E2D7212F360A200FC9BCA                   = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C61E2D8512F360A200FC9BCA /* Build configuration list for PBXNativeTarget "libkmodtest" */;
+			buildConfigurationList = C61E2D8512F360A200FC9BCA                                                                 ;
 			buildPhases = (
-				C61E2D6D12F360A200FC9BCA /* Sources */,
-				C61E2D6E12F360A200FC9BCA /* Frameworks */,
-				C61E2D6F12F360A200FC9BCA /* Headers */,
-				C61E2D7012F360A200FC9BCA /* Resources */,
-				C61E2D7112F360A200FC9BCA /* Rez */,
+				C61E2D6D12F360A200FC9BCA              ,
+				C61E2D6E12F360A200FC9BCA                 ,
+				C61E2D6F12F360A200FC9BCA              ,
+				C61E2D7012F360A200FC9BCA                ,
+				C61E2D7112F360A200FC9BCA          ,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				C61E2DB212F36AC700FC9BCA /* PBXTargetDependency */,
-				C61E2DB412F36ACB00FC9BCA /* PBXTargetDependency */,
+				C61E2DB212F36AC700FC9BCA                          ,
+				C61E2DB412F36ACB00FC9BCA                          ,
 			);
 			name = libkmodtest;
 			productName = libkmodtest;
-			productReference = C61E2D7312F360A200FC9BCA /* libkmodtest.kext */;
+			productReference = C61E2D7312F360A200FC9BCA                       ;
 			productType = "com.apple.product-type.kernel-extension";
 		};
-		C61E2D9112F3642100FC9BCA /* libkmod */ = {
+		C61E2D9112F3642100FC9BCA               = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C61E2D9312F3642100FC9BCA /* Build configuration list for PBXNativeTarget "libkmod" */;
+			buildConfigurationList = C61E2D9312F3642100FC9BCA                                                             ;
 			buildPhases = (
-				C61E2D8E12F3642100FC9BCA /* Sources */,
-				C61E2D8F12F3642100FC9BCA /* Frameworks */,
-				C61E2D9012F3642100FC9BCA /* Headers */,
+				C61E2D8E12F3642100FC9BCA              ,
+				C61E2D8F12F3642100FC9BCA                 ,
+				C61E2D9012F3642100FC9BCA              ,
 			);
 			buildRules = (
 			);
@@ -223,16 +223,16 @@
 			);
 			name = libkmod;
 			productName = libkmod;
-			productReference = C61E2D9212F3642100FC9BCA /* libkmod.a */;
+			productReference = C61E2D9212F3642100FC9BCA                ;
 			productType = "com.apple.product-type.library.static";
 		};
-		C61E2D9D12F364C100FC9BCA /* libkmodc++ */ = {
+		C61E2D9D12F364C100FC9BCA                  = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C61E2D9F12F364C100FC9BCA /* Build configuration list for PBXNativeTarget "libkmodc++" */;
+			buildConfigurationList = C61E2D9F12F364C100FC9BCA                                                                ;
 			buildPhases = (
-				C61E2D9A12F364C100FC9BCA /* Sources */,
-				C61E2D9B12F364C100FC9BCA /* Frameworks */,
-				C61E2D9C12F364C100FC9BCA /* Headers */,
+				C61E2D9A12F364C100FC9BCA              ,
+				C61E2D9B12F364C100FC9BCA                 ,
+				C61E2D9C12F364C100FC9BCA              ,
 			);
 			buildRules = (
 			);
@@ -240,18 +240,18 @@
 			);
 			name = "libkmodc++";
 			productName = "libkmodc++";
-			productReference = C61E2D9E12F364C100FC9BCA /* libkmodc++.a */;
+			productReference = C61E2D9E12F364C100FC9BCA                   ;
 			productType = "com.apple.product-type.library.static";
 		};
-/* End PBXNativeTarget section */
+                                 
 
-/* Begin PBXProject section */
-		C61E2D6012F3605700FC9BCA /* Project object */ = {
+                              
+		C61E2D6012F3605700FC9BCA                      = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0420;
 			};
-			buildConfigurationList = C61E2D6312F3605700FC9BCA /* Build configuration list for PBXProject "libkmod" */;
+			buildConfigurationList = C61E2D6312F3605700FC9BCA                                                        ;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -259,100 +259,100 @@
 				en,
 			);
 			mainGroup = C61E2D5E12F3605700FC9BCA;
-			productRefGroup = C61E2D7412F360A200FC9BCA /* Products */;
+			productRefGroup = C61E2D7412F360A200FC9BCA               ;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C61E2D9512F3647000FC9BCA /* All */,
-				C61E2D9112F3642100FC9BCA /* libkmod */,
-				C61E2D9D12F364C100FC9BCA /* libkmodc++ */,
-				C61E2D7212F360A200FC9BCA /* libkmodtest */,
+				C61E2D9512F3647000FC9BCA          ,
+				C61E2D9112F3642100FC9BCA              ,
+				C61E2D9D12F364C100FC9BCA                 ,
+				C61E2D7212F360A200FC9BCA                  ,
 			);
 		};
-/* End PBXProject section */
+                            
 
-/* Begin PBXResourcesBuildPhase section */
-		C61E2D7012F360A200FC9BCA /* Resources */ = {
+                                          
+		C61E2D7012F360A200FC9BCA                 = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C61E2DAC12F3661900FC9BCA /* README in Resources */,
+				C61E2DAC12F3661900FC9BCA                          ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
+                                        
 
-/* Begin PBXRezBuildPhase section */
-		C61E2D7112F360A200FC9BCA /* Rez */ = {
+                                    
+		C61E2D7112F360A200FC9BCA           = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXRezBuildPhase section */
+                                  
 
-/* Begin PBXSourcesBuildPhase section */
-		C61E2D6D12F360A200FC9BCA /* Sources */ = {
+                                        
+		C61E2D6D12F360A200FC9BCA               = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C61E2D8212F360A200FC9BCA /* libkmodtest.cpp in Sources */,
+				C61E2D8212F360A200FC9BCA                                 ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C61E2D8E12F3642100FC9BCA /* Sources */ = {
+		C61E2D8E12F3642100FC9BCA               = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C61E2DAD12F3672F00FC9BCA /* c_start.c in Sources */,
-				C61E2DAE12F3672F00FC9BCA /* c_stop.c in Sources */,
+				C61E2DAD12F3672F00FC9BCA                           ,
+				C61E2DAE12F3672F00FC9BCA                          ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C61E2D9A12F364C100FC9BCA /* Sources */ = {
+		C61E2D9A12F364C100FC9BCA               = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C61E2DAF12F3673A00FC9BCA /* cplus_start.c in Sources */,
-				C61E2DB012F3673A00FC9BCA /* cplus_stop.c in Sources */,
+				C61E2DAF12F3673A00FC9BCA                               ,
+				C61E2DB012F3673A00FC9BCA                              ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXSourcesBuildPhase section */
+                                      
 
-/* Begin PBXTargetDependency section */
-		C61E2D9912F364A800FC9BCA /* PBXTargetDependency */ = {
+                                       
+		C61E2D9912F364A800FC9BCA                           = {
 			isa = PBXTargetDependency;
-			target = C61E2D9112F3642100FC9BCA /* libkmod */;
-			targetProxy = C61E2D9812F364A800FC9BCA /* PBXContainerItemProxy */;
+			target = C61E2D9112F3642100FC9BCA              ;
+			targetProxy = C61E2D9812F364A800FC9BCA                            ;
 		};
-		C61E2DA212F3650100FC9BCA /* PBXTargetDependency */ = {
+		C61E2DA212F3650100FC9BCA                           = {
 			isa = PBXTargetDependency;
-			target = C61E2D9D12F364C100FC9BCA /* libkmodc++ */;
-			targetProxy = C61E2DA112F3650100FC9BCA /* PBXContainerItemProxy */;
+			target = C61E2D9D12F364C100FC9BCA                 ;
+			targetProxy = C61E2DA112F3650100FC9BCA                            ;
 		};
-		C61E2DB212F36AC700FC9BCA /* PBXTargetDependency */ = {
+		C61E2DB212F36AC700FC9BCA                           = {
 			isa = PBXTargetDependency;
-			target = C61E2D9112F3642100FC9BCA /* libkmod */;
-			targetProxy = C61E2DB112F36AC700FC9BCA /* PBXContainerItemProxy */;
+			target = C61E2D9112F3642100FC9BCA              ;
+			targetProxy = C61E2DB112F36AC700FC9BCA                            ;
 		};
-		C61E2DB412F36ACB00FC9BCA /* PBXTargetDependency */ = {
+		C61E2DB412F36ACB00FC9BCA                           = {
 			isa = PBXTargetDependency;
-			target = C61E2D9D12F364C100FC9BCA /* libkmodc++ */;
-			targetProxy = C61E2DB312F36ACB00FC9BCA /* PBXContainerItemProxy */;
+			target = C61E2D9D12F364C100FC9BCA                 ;
+			targetProxy = C61E2DB312F36ACB00FC9BCA                            ;
 		};
-/* End PBXTargetDependency section */
+                                     
 
-/* Begin XCBuildConfiguration section */
-		C61E2D6612F3605700FC9BCA /* Release */ = {
+                                        
+		C61E2D6612F3605700FC9BCA               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 			};
 			name = Release;
 		};
-		C61E2D8412F360A200FC9BCA /* Release */ = {
+		C61E2D8412F360A200FC9BCA               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1.0.0d1;
@@ -368,7 +368,7 @@
 			};
 			name = Release;
 		};
-		C61E2D9412F3642100FC9BCA /* Release */ = {
+		C61E2D9412F3642100FC9BCA               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
@@ -397,14 +397,14 @@
 			};
 			name = Release;
 		};
-		C61E2D9712F3647000FC9BCA /* Release */ = {
+		C61E2D9712F3647000FC9BCA               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
-		C61E2DA012F364C100FC9BCA /* Release */ = {
+		C61E2DA012F364C100FC9BCA               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
@@ -433,50 +433,50 @@
 			};
 			name = Release;
 		};
-/* End XCBuildConfiguration section */
+                                      
 
-/* Begin XCConfigurationList section */
-		C61E2D6312F3605700FC9BCA /* Build configuration list for PBXProject "libkmod" */ = {
+                                       
+		C61E2D6312F3605700FC9BCA                                                         = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C61E2D6612F3605700FC9BCA /* Release */,
+				C61E2D6612F3605700FC9BCA              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C61E2D8512F360A200FC9BCA /* Build configuration list for PBXNativeTarget "libkmodtest" */ = {
+		C61E2D8512F360A200FC9BCA                                                                  = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C61E2D8412F360A200FC9BCA /* Release */,
+				C61E2D8412F360A200FC9BCA              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C61E2D9312F3642100FC9BCA /* Build configuration list for PBXNativeTarget "libkmod" */ = {
+		C61E2D9312F3642100FC9BCA                                                              = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C61E2D9412F3642100FC9BCA /* Release */,
+				C61E2D9412F3642100FC9BCA              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C61E2D9612F3647000FC9BCA /* Build configuration list for PBXAggregateTarget "All" */ = {
+		C61E2D9612F3647000FC9BCA                                                             = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C61E2D9712F3647000FC9BCA /* Release */,
+				C61E2D9712F3647000FC9BCA              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C61E2D9F12F364C100FC9BCA /* Build configuration list for PBXNativeTarget "libkmodc++" */ = {
+		C61E2D9F12F364C100FC9BCA                                                                 = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C61E2DA012F364C100FC9BCA /* Release */,
+				C61E2DA012F364C100FC9BCA              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-/* End XCConfigurationList section */
+                                     
 	};
-	rootObject = C61E2D6012F3605700FC9BCA /* Project object */;
+	rootObject = C61E2D6012F3605700FC9BCA                     ;
 }

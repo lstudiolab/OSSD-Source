@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	Activity Trace Manager interface type declarations
- */
+  
+                                                     
+   
 
 #ifndef	_ATM_ATM_TYPES_DEFS_
 #define _ATM_ATM_TYPES_DEFS_
@@ -43,5 +43,5 @@ type atm_memory_size_array_t = array[*:512] of uint64_t;
 
 import <atm/atm_types.h>;
 
-#endif	/* _ATM_ATM_TYPES_DEFS_ */
-/* vim: set ft=c : */
+#endif	                          
+                     

@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 subsystem 
 #if	KERNEL_USER
@@ -67,68 +67,68 @@ subsystem
 #if	SEQNOS
 serverprefix do_seqnos_;
 serverdemux seqnos_notify_server;
-#else	/* !SEQNOS */
+#else	             
 serverprefix do_;
 serverdemux notify_server;
-#endif	/* SEQNOS */
+#endif	            
 
-/* MACH_NOTIFY_FIRST: 0100 */
+                             
 skip;
 
-/* MACH_NOTIFY_PORT_DELETED: 0101 */
+                                    
 simpleroutine mach_notify_port_deleted(
 		notify	: mach_port_move_send_once_t;
 #if	SEQNOS
 	msgseqno seqno	: mach_port_seqno_t;
-#endif	/* SEQNOS */
+#endif	            
 		name	: mach_port_name_t);
 
 #if (KERNEL_USER | MACH_NOTIFY_SEND_POSSIBLE_EXPECTED)
-/* MACH_NOTIFY_SEND_POSSIBLE: 0102 */
+                                     
 simpleroutine mach_notify_send_possible(
 		notify	: mach_port_move_send_once_t;
 #if	SEQNOS
 	msgseqno seqno	: mach_port_seqno_t;
-#endif	/* SEQNOS */
+#endif	            
 		name	: mach_port_name_t);
 #else
 skip;
 #endif
 
-skip;	/* was NOTIFY_OWNERSHIP_RIGHTS: 0103 */
+skip;	                                       
 
-skip;	/* was NOTIFY_RECEIVE_RIGHTS: 0104 */
+skip;	                                     
 
-/* MACH_NOTIFY_PORT_DESTROYED: 0105 */
+                                      
 simpleroutine mach_notify_port_destroyed(
 		notify	: mach_port_move_send_once_t;
 #if	SEQNOS
 	msgseqno seqno	: mach_port_seqno_t;
-#endif	/* SEQNOS */
+#endif	            
 		rights	: mach_port_move_receive_t);
 
-/* MACH_NOTIFY_NO_SENDERS: 0106 */
+                                  
 simpleroutine mach_notify_no_senders(
 		notify	: mach_port_move_send_once_t;
 #if	SEQNOS
 	msgseqno seqno	: mach_port_seqno_t;
-#endif	/* SEQNOS */
+#endif	            
 		mscount	: mach_port_mscount_t);
 
-/* MACH_NOTIFY_SEND_ONCE: 0107 */
+                                 
 simpleroutine mach_notify_send_once(
 		notify	: mach_port_move_send_once_t
 #if	SEQNOS
 ;	msgseqno seqno	: mach_port_seqno_t
-#endif	/* SEQNOS */
+#endif	            
 		);
 
-/* MACH_NOTIFY_DEAD_NAME: 0110 */
+                                 
 simpleroutine mach_notify_dead_name(
 		notify	: mach_port_move_send_once_t;
 #if	SEQNOS
 	msgseqno seqno	: mach_port_seqno_t;
-#endif	/* SEQNOS */
+#endif	            
 		name	: mach_port_name_t);
 
-/* vim: set ft=c : */
+                     

@@ -26,15 +26,15 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *  Interface definition for the namespace facility.
- */
+  
+                                                    
+   
 
 subsystem
 #if KERNEL_USER
     KernelUser
-#endif /* KERNEL_USER */
-    vfs_nspace 867800; /* 'V''N'00 */
+#endif                  
+    vfs_nspace 867800;               
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
@@ -43,7 +43,7 @@ subsystem
 ServerPrefix receive_;
 UserPrefix   send_;
 
-/* DEPRECATED */
+                
 routine nspace_handle(
               nspace_handler_port : mach_port_t;
               pid                 : uint32_t;
@@ -65,4 +65,4 @@ routine nspace_resolve_path(
           out xxx_rdar44371223    : int
 );
 
-/* vim: set ft=c : */
+                     

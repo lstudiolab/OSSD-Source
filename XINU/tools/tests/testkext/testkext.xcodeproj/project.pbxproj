@@ -1,4 +1,4 @@
-// !$*UTF8*$!
+             
 {
 	archiveVersion = 1;
 	classes = {
@@ -6,116 +6,116 @@
 	objectVersion = 45;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		086FC22B1E0347E700A7EBEF /* pgokext.c in Sources */ = {isa = PBXBuildFile; fileRef = 086FC22A1E0347E700A7EBEF /* pgokext.c */; };
-		C68D22B30EB2441400C3A06C /* testvmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C68D22B20EB2441400C3A06C /* testvmx.cpp */; };
-		C6CBD9CE1225B9FF00F317B5 /* testthreadcall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C6CBD9CD1225B9FF00F317B5 /* testthreadcall.cpp */; };
-/* End PBXBuildFile section */
+                                
+		086FC22B1E0347E700A7EBEF                            = {isa = PBXBuildFile; fileRef = 086FC22A1E0347E700A7EBEF                ; };
+		C68D22B30EB2441400C3A06C                              = {isa = PBXBuildFile; fileRef = C68D22B20EB2441400C3A06C                  ; };
+		C6CBD9CE1225B9FF00F317B5                                     = {isa = PBXBuildFile; fileRef = C6CBD9CD1225B9FF00F317B5                         ; };
+                              
 
-/* Begin PBXFileReference section */
-		086FC2281E0347E700A7EBEF /* pgokext.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pgokext.kext; sourceTree = BUILT_PRODUCTS_DIR; };
-		086FC22A1E0347E700A7EBEF /* pgokext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pgokext.c; sourceTree = "<group>"; };
-		086FC22C1E0347E700A7EBEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8DA8362C06AD9B9200E5AC22 /* Kernel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kernel.framework; path = /System/Library/Frameworks/Kernel.framework; sourceTree = "<absolute>"; };
-		C68D22A80EB243BC00C3A06C /* testvmx.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testvmx.kext; sourceTree = BUILT_PRODUCTS_DIR; };
-		C68D22A90EB243BC00C3A06C /* testvmx-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "testvmx-Info.plist"; sourceTree = "<group>"; };
-		C68D22B10EB2441400C3A06C /* testvmx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testvmx.h; sourceTree = "<group>"; };
-		C68D22B20EB2441400C3A06C /* testvmx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testvmx.cpp; sourceTree = "<group>"; };
-		C6CBD9C31225B98F00F317B5 /* testthreadcall.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testthreadcall.kext; sourceTree = BUILT_PRODUCTS_DIR; };
-		C6CBD9C41225B98F00F317B5 /* testthreadcall-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "testthreadcall-Info.plist"; sourceTree = "<group>"; };
-		C6CBD9CC1225B9FF00F317B5 /* testthreadcall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testthreadcall.h; sourceTree = "<group>"; };
-		C6CBD9CD1225B9FF00F317B5 /* testthreadcall.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testthreadcall.cpp; sourceTree = "<group>"; };
-/* End PBXFileReference section */
+                                    
+		086FC2281E0347E700A7EBEF                    = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pgokext.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		086FC22A1E0347E700A7EBEF                 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pgokext.c; sourceTree = "<group>"; };
+		086FC22C1E0347E700A7EBEF                  = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8DA8362C06AD9B9200E5AC22                        = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kernel.framework; path = /System/Library/Frameworks/Kernel.framework; sourceTree = "<absolute>"; };
+		C68D22A80EB243BC00C3A06C                    = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testvmx.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		C68D22A90EB243BC00C3A06C                          = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "testvmx-Info.plist"; sourceTree = "<group>"; };
+		C68D22B10EB2441400C3A06C                 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testvmx.h; sourceTree = "<group>"; };
+		C68D22B20EB2441400C3A06C                   = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testvmx.cpp; sourceTree = "<group>"; };
+		C6CBD9C31225B98F00F317B5                           = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = testthreadcall.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6CBD9C41225B98F00F317B5                                 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "testthreadcall-Info.plist"; sourceTree = "<group>"; };
+		C6CBD9CC1225B9FF00F317B5                        = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testthreadcall.h; sourceTree = "<group>"; };
+		C6CBD9CD1225B9FF00F317B5                          = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testthreadcall.cpp; sourceTree = "<group>"; };
+                                  
 
-/* Begin PBXFrameworksBuildPhase section */
-		086FC2241E0347E700A7EBEF /* Frameworks */ = {
+                                           
+		086FC2241E0347E700A7EBEF                  = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C68D22A60EB243BC00C3A06C /* Frameworks */ = {
+		C68D22A60EB243BC00C3A06C                  = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C6CBD9C11225B98F00F317B5 /* Frameworks */ = {
+		C6CBD9C11225B98F00F317B5                  = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXFrameworksBuildPhase section */
+                                         
 
-/* Begin PBXGroup section */
-		086FC2291E0347E700A7EBEF /* pgokext */ = {
+                            
+		086FC2291E0347E700A7EBEF               = {
 			isa = PBXGroup;
 			children = (
-				086FC22A1E0347E700A7EBEF /* pgokext.c */,
-				086FC22C1E0347E700A7EBEF /* Info.plist */,
+				086FC22A1E0347E700A7EBEF                ,
+				086FC22C1E0347E700A7EBEF                 ,
 			);
 			path = pgokext;
 			sourceTree = "<group>";
 		};
-		089C166AFE841209C02AAC07 /* testkext */ = {
+		089C166AFE841209C02AAC07                = {
 			isa = PBXGroup;
 			children = (
-				247142CAFF3F8F9811CA285C /* Source */,
-				8DA8362C06AD9B9200E5AC22 /* Kernel.framework */,
-				086FC2291E0347E700A7EBEF /* pgokext */,
-				19C28FB6FE9D52B211CA2CBB /* Products */,
+				247142CAFF3F8F9811CA285C             ,
+				8DA8362C06AD9B9200E5AC22                       ,
+				086FC2291E0347E700A7EBEF              ,
+				19C28FB6FE9D52B211CA2CBB               ,
 			);
 			name = testkext;
 			sourceTree = "<group>";
 		};
-		19C28FB6FE9D52B211CA2CBB /* Products */ = {
+		19C28FB6FE9D52B211CA2CBB                = {
 			isa = PBXGroup;
 			children = (
-				C68D22A80EB243BC00C3A06C /* testvmx.kext */,
-				C6CBD9C31225B98F00F317B5 /* testthreadcall.kext */,
-				086FC2281E0347E700A7EBEF /* pgokext.kext */,
+				C68D22A80EB243BC00C3A06C                   ,
+				C6CBD9C31225B98F00F317B5                          ,
+				086FC2281E0347E700A7EBEF                   ,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		247142CAFF3F8F9811CA285C /* Source */ = {
+		247142CAFF3F8F9811CA285C              = {
 			isa = PBXGroup;
 			children = (
-				C6CBD9CC1225B9FF00F317B5 /* testthreadcall.h */,
-				C6CBD9CD1225B9FF00F317B5 /* testthreadcall.cpp */,
-				C68D22B10EB2441400C3A06C /* testvmx.h */,
-				C68D22B20EB2441400C3A06C /* testvmx.cpp */,
-				C68D22A90EB243BC00C3A06C /* testvmx-Info.plist */,
-				C6CBD9C41225B98F00F317B5 /* testthreadcall-Info.plist */,
+				C6CBD9CC1225B9FF00F317B5                       ,
+				C6CBD9CD1225B9FF00F317B5                         ,
+				C68D22B10EB2441400C3A06C                ,
+				C68D22B20EB2441400C3A06C                  ,
+				C68D22A90EB243BC00C3A06C                         ,
+				C6CBD9C41225B98F00F317B5                                ,
 			);
 			name = Source;
 			sourceTree = "<group>";
 		};
-/* End PBXGroup section */
+                          
 
-/* Begin PBXHeadersBuildPhase section */
-		086FC2251E0347E700A7EBEF /* Headers */ = {
+                                        
+		086FC2251E0347E700A7EBEF               = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXHeadersBuildPhase section */
+                                      
 
-/* Begin PBXNativeTarget section */
-		086FC2271E0347E700A7EBEF /* pgokext */ = {
+                                   
+		086FC2271E0347E700A7EBEF               = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 086FC22F1E0347E700A7EBEF /* Build configuration list for PBXNativeTarget "pgokext" */;
+			buildConfigurationList = 086FC22F1E0347E700A7EBEF                                                             ;
 			buildPhases = (
-				086FC2231E0347E700A7EBEF /* Sources */,
-				086FC2241E0347E700A7EBEF /* Frameworks */,
-				086FC2251E0347E700A7EBEF /* Headers */,
-				086FC2261E0347E700A7EBEF /* Resources */,
+				086FC2231E0347E700A7EBEF              ,
+				086FC2241E0347E700A7EBEF                 ,
+				086FC2251E0347E700A7EBEF              ,
+				086FC2261E0347E700A7EBEF                ,
 			);
 			buildRules = (
 			);
@@ -123,16 +123,16 @@
 			);
 			name = pgokext;
 			productName = pgokext;
-			productReference = 086FC2281E0347E700A7EBEF /* pgokext.kext */;
+			productReference = 086FC2281E0347E700A7EBEF                   ;
 			productType = "com.apple.product-type.kernel-extension";
 		};
-		C68D22A70EB243BC00C3A06C /* testvmx */ = {
+		C68D22A70EB243BC00C3A06C               = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C68D22AC0EB243BD00C3A06C /* Build configuration list for PBXNativeTarget "testvmx" */;
+			buildConfigurationList = C68D22AC0EB243BD00C3A06C                                                             ;
 			buildPhases = (
-				C68D22A40EB243BC00C3A06C /* Sources */,
-				C68D22A50EB243BC00C3A06C /* Resources */,
-				C68D22A60EB243BC00C3A06C /* Frameworks */,
+				C68D22A40EB243BC00C3A06C              ,
+				C68D22A50EB243BC00C3A06C                ,
+				C68D22A60EB243BC00C3A06C                 ,
 			);
 			buildRules = (
 			);
@@ -140,16 +140,16 @@
 			);
 			name = testvmx;
 			productName = testvmx;
-			productReference = C68D22A80EB243BC00C3A06C /* testvmx.kext */;
+			productReference = C68D22A80EB243BC00C3A06C                   ;
 			productType = "com.apple.product-type.kernel-extension.iokit";
 		};
-		C6CBD9C21225B98F00F317B5 /* testthreadcall */ = {
+		C6CBD9C21225B98F00F317B5                      = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C6CBD9C71225B98F00F317B5 /* Build configuration list for PBXNativeTarget "testthreadcall" */;
+			buildConfigurationList = C6CBD9C71225B98F00F317B5                                                                    ;
 			buildPhases = (
-				C6CBD9BF1225B98F00F317B5 /* Sources */,
-				C6CBD9C01225B98F00F317B5 /* Resources */,
-				C6CBD9C11225B98F00F317B5 /* Frameworks */,
+				C6CBD9BF1225B98F00F317B5              ,
+				C6CBD9C01225B98F00F317B5                ,
+				C6CBD9C11225B98F00F317B5                 ,
 			);
 			buildRules = (
 			);
@@ -157,13 +157,13 @@
 			);
 			name = testthreadcall;
 			productName = testthreadcall;
-			productReference = C6CBD9C31225B98F00F317B5 /* testthreadcall.kext */;
+			productReference = C6CBD9C31225B98F00F317B5                          ;
 			productType = "com.apple.product-type.kernel-extension.iokit";
 		};
-/* End PBXNativeTarget section */
+                                 
 
-/* Begin PBXProject section */
-		089C1669FE841209C02AAC07 /* Project object */ = {
+                              
+		089C1669FE841209C02AAC07                      = {
 			isa = PBXProject;
 			attributes = {
 				TargetAttributes = {
@@ -173,7 +173,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 1DEB91DD08733DB10010E9CD /* Build configuration list for PBXProject "testkext" */;
+			buildConfigurationList = 1DEB91DD08733DB10010E9CD                                                         ;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -183,70 +183,70 @@
 				French,
 				German,
 			);
-			mainGroup = 089C166AFE841209C02AAC07 /* testkext */;
+			mainGroup = 089C166AFE841209C02AAC07               ;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C68D22A70EB243BC00C3A06C /* testvmx */,
-				C6CBD9C21225B98F00F317B5 /* testthreadcall */,
-				086FC2271E0347E700A7EBEF /* pgokext */,
+				C68D22A70EB243BC00C3A06C              ,
+				C6CBD9C21225B98F00F317B5                     ,
+				086FC2271E0347E700A7EBEF              ,
 			);
 		};
-/* End PBXProject section */
+                            
 
-/* Begin PBXResourcesBuildPhase section */
-		086FC2261E0347E700A7EBEF /* Resources */ = {
+                                          
+		086FC2261E0347E700A7EBEF                 = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C68D22A50EB243BC00C3A06C /* Resources */ = {
+		C68D22A50EB243BC00C3A06C                 = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C6CBD9C01225B98F00F317B5 /* Resources */ = {
+		C6CBD9C01225B98F00F317B5                 = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXResourcesBuildPhase section */
+                                        
 
-/* Begin PBXSourcesBuildPhase section */
-		086FC2231E0347E700A7EBEF /* Sources */ = {
+                                        
+		086FC2231E0347E700A7EBEF               = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				086FC22B1E0347E700A7EBEF /* pgokext.c in Sources */,
+				086FC22B1E0347E700A7EBEF                           ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C68D22A40EB243BC00C3A06C /* Sources */ = {
+		C68D22A40EB243BC00C3A06C               = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C68D22B30EB2441400C3A06C /* testvmx.cpp in Sources */,
+				C68D22B30EB2441400C3A06C                             ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C6CBD9BF1225B98F00F317B5 /* Sources */ = {
+		C6CBD9BF1225B98F00F317B5               = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C6CBD9CE1225B9FF00F317B5 /* testthreadcall.cpp in Sources */,
+				C6CBD9CE1225B9FF00F317B5                                    ,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXSourcesBuildPhase section */
+                                      
 
-/* Begin XCBuildConfiguration section */
-		086FC22D1E0347E700A7EBEF /* Debug */ = {
+                                        
+		086FC22D1E0347E700A7EBEF             = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -298,7 +298,7 @@
 			};
 			name = Debug;
 		};
-		086FC22E1E0347E700A7EBEF /* Release */ = {
+		086FC22E1E0347E700A7EBEF               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -345,7 +345,7 @@
 			};
 			name = Release;
 		};
-		1DEB91DE08733DB10010E9CD /* Debug */ = {
+		1DEB91DE08733DB10010E9CD             = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
@@ -358,7 +358,7 @@
 			};
 			name = Debug;
 		};
-		1DEB91DF08733DB10010E9CD /* Release */ = {
+		1DEB91DF08733DB10010E9CD               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
@@ -369,7 +369,7 @@
 			};
 			name = Release;
 		};
-		C68D22AA0EB243BD00C3A06C /* Debug */ = {
+		C68D22AA0EB243BD00C3A06C             = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -390,7 +390,7 @@
 			};
 			name = Debug;
 		};
-		C68D22AB0EB243BD00C3A06C /* Release */ = {
+		C68D22AB0EB243BD00C3A06C               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -410,7 +410,7 @@
 			};
 			name = Release;
 		};
-		C6CBD9C51225B98F00F317B5 /* Debug */ = {
+		C6CBD9C51225B98F00F317B5             = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -430,7 +430,7 @@
 			};
 			name = Debug;
 		};
-		C6CBD9C61225B98F00F317B5 /* Release */ = {
+		C6CBD9C61225B98F00F317B5               = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -449,46 +449,46 @@
 			};
 			name = Release;
 		};
-/* End XCBuildConfiguration section */
+                                      
 
-/* Begin XCConfigurationList section */
-		086FC22F1E0347E700A7EBEF /* Build configuration list for PBXNativeTarget "pgokext" */ = {
+                                       
+		086FC22F1E0347E700A7EBEF                                                              = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				086FC22D1E0347E700A7EBEF /* Debug */,
-				086FC22E1E0347E700A7EBEF /* Release */,
+				086FC22D1E0347E700A7EBEF            ,
+				086FC22E1E0347E700A7EBEF              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1DEB91DD08733DB10010E9CD /* Build configuration list for PBXProject "testkext" */ = {
+		1DEB91DD08733DB10010E9CD                                                          = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1DEB91DE08733DB10010E9CD /* Debug */,
-				1DEB91DF08733DB10010E9CD /* Release */,
+				1DEB91DE08733DB10010E9CD            ,
+				1DEB91DF08733DB10010E9CD              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C68D22AC0EB243BD00C3A06C /* Build configuration list for PBXNativeTarget "testvmx" */ = {
+		C68D22AC0EB243BD00C3A06C                                                              = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C68D22AA0EB243BD00C3A06C /* Debug */,
-				C68D22AB0EB243BD00C3A06C /* Release */,
+				C68D22AA0EB243BD00C3A06C            ,
+				C68D22AB0EB243BD00C3A06C              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C6CBD9C71225B98F00F317B5 /* Build configuration list for PBXNativeTarget "testthreadcall" */ = {
+		C6CBD9C71225B98F00F317B5                                                                     = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C6CBD9C51225B98F00F317B5 /* Debug */,
-				C6CBD9C61225B98F00F317B5 /* Release */,
+				C6CBD9C51225B98F00F317B5            ,
+				C6CBD9C61225B98F00F317B5              ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-/* End XCConfigurationList section */
+                                     
 	};
-	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+	rootObject = 089C1669FE841209C02AAC07                     ;
 }

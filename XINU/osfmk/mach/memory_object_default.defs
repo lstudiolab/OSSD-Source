@@ -53,23 +53,23 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- * File:	mach/memory_object_default.defs
- *
- * Abstract:
- *	Mach external memory management interface declaration; subset
- *	that is applicable to managers of kernel-created memory objects.
- */
+  
+   
+  
+                                        
+  
+            
+                                                                
+                                                                   
+   
 
 subsystem
 #if	KERNEL_USER
 	KernelUser
-#endif	/* KERNEL_USER */
+#endif	                 
 #if	KERNEL_SERVER
 	KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		     memory_object_default 2250;
 
 #include <mach/std_types.defs>
@@ -79,16 +79,16 @@ subsystem
 serverprefix default_pager_;
 #endif
 
-/*
- *	Pass on responsibility for the new kernel-created memory
- *	object.  The port on which this request is that port
- *	(possibly a memory object itself) registered as the "default
- *	pager".  Other arguments are as described for memory_object_init.
- *	[No reply required.]
- */
+  
+                                                           
+                                                       
+                                                               
+                                                                    
+                       
+   
 routine	memory_object_create(
 		default_memory_manager	: memory_object_default_t;
 		new_memory_object_size	: vm_size_t;
 	out	new_memory_object	: memory_object_t);
 
-/* vim: set ft=c : */
+                     

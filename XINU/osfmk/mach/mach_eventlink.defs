@@ -29,7 +29,7 @@
 subsystem
 #if	KERNEL_SERVER
 	KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 			mach_eventlink 716200;
 
 #include <mach/std_types.defs>
@@ -58,4 +58,4 @@ routine mach_eventlink_disassociate(
 		eventlink        : eventlink_t;
 		option           : mach_eventlink_disassociate_option_t);
 
- /* vim: set ft=c : */
+                      

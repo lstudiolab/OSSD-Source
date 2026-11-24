@@ -52,16 +52,16 @@ inline int B_PASSIVE = 0x0800;
 #pragma D binding "1.0" B_PASSIVE
 
 typedef struct bufinfo {
-	int b_flags;			/* buffer status */
-	size_t b_bcount;		/* number of bytes */
-	caddr_t b_addr;			/* buffer address */
-	uint64_t b_lblkno;		/* block # on device */
-	uint64_t b_blkno;		/* expanded block # on device */
-	size_t b_resid;			/* # of bytes not transferred */
-	size_t b_bufsize;		/* size of allocated buffer */
-	caddr_t b_iodone;		/* I/O completion routine */
-	int b_error;			/* expanded error field */
-	dev_t b_edev;			/* extended device */
+	int b_flags;			                   
+	size_t b_bcount;		                     
+	caddr_t b_addr;			                    
+	uint64_t b_lblkno;		                       
+	uint64_t b_blkno;		                                
+	size_t b_resid;			                                
+	size_t b_bufsize;		                              
+	caddr_t b_iodone;		                            
+	int b_error;			                          
+	dev_t b_edev;			                     
 } bufinfo_t;
 
 #pragma D binding "1.0" translator
@@ -79,12 +79,12 @@ translator bufinfo_t < struct buf *B > {
 };
 
 typedef struct devinfo {
-	int dev_major;			/* major number */
-	int dev_minor;			/* minor number */
-	int dev_instance;		/* instance number */
-	string dev_name;		/* name of device */
-	string dev_statname;		/* name of device + instance/minor */
-	string dev_pathname;		/* pathname of device */
+	int dev_major;			                  
+	int dev_minor;			                  
+	int dev_instance;		                     
+	string dev_name;		                    
+	string dev_statname;		                                     
+	string dev_pathname;		                        
 } devinfo_t;
 
 #pragma D binding "1.0" translator
@@ -92,21 +92,21 @@ translator devinfo_t < struct buf *B > {
 	dev_major = getmajor(B->b_dev);
 	dev_minor = getminor(B->b_dev);
 	dev_instance = getminor(B->b_dev);
-	dev_name = "??"; /* XXX */
-	dev_statname = "??"; /* XXX */
-	dev_pathname = "??"; /* XXX */
+	dev_name = "??";          
+	dev_statname = "??";          
+	dev_pathname = "??";          
 };
 
 typedef off_t offset_t;
 
 typedef struct fileinfo {
-	string fi_name;			/* name (basename of fi_pathname) */
-	string fi_dirname;		/* directory (dirname of fi_pathname) */
-	string fi_pathname;		/* full pathname */
-	offset_t fi_offset;		/* offset within file */
-	string fi_fs;			/* filesystem */
-	string fi_mount;		/* mount point of file system */
-	int fi_oflags;          /* open(2) flags for file descriptor */
+	string fi_name;			                                    
+	string fi_dirname;		                                        
+	string fi_pathname;		                   
+	offset_t fi_offset;		                        
+	string fi_fs;			                
+	string fi_mount;		                                
+	int fi_oflags;                                                 
 } fileinfo_t;
 
 #pragma D binding "1.0" translator
@@ -131,13 +131,13 @@ translator fileinfo_t < struct buf *B > {
 	fi_oflags = 0;
 };
 
-/*
- * The following inline constants can be used to examine fi_oflags when using
- * the fds[] array or a translated fileglob *.  Note that the various open
- * flags behave as a bit-field *except* for O_RDONLY, O_WRONLY, and O_RDWR.
- * To test the open mode, you write code similar to that used with the fcntl(2)
- * F_GET[X]FL command, such as: if ((fi_oflags & O_ACCMODE) == O_WRONLY).
- */
+  
+                                                                             
+                                                                          
+                                                                           
+                                                                               
+                                                                         
+   
 inline int O_ACCMODE = 0x0003;
 #pragma D binding "1.1" O_ACCMODE
 
@@ -179,7 +179,7 @@ inline int O_SYMLINK = 0x200000;
 inline int O_NOFOLLOW_ANY = 0x20000000;
 #pragma D binding "1.1" O_NOFOLLOW_ANY
 
-/* From bsd/sys/file_internal.h */
+                                  
 inline int DTYPE_VNODE = 1;
 #pragma D binding "1.1" DTYPE_VNODE
 inline int DTYPE_SOCKET = 2;
@@ -236,7 +236,7 @@ translator fileinfo_t < struct fileglob *F > {
 			((struct vnode *)F->fg_data)->v_mount->mnt_vnodecovered->v_name;
 
 	fi_oflags = (F == NULL) ? 0 :
-			F->fg_flag - 1; /* Subtract one to map FREAD/FWRITE bitfield to O_RD/WR open() flags. */
+			F->fg_flag - 1;                                                                         
 };
 
 inline fileinfo_t fds[int fd] = xlate <fileinfo_t> (

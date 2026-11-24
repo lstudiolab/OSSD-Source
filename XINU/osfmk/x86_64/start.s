@@ -106,20 +106,20 @@ EXT(mc_task_stack_end):
 
 	                          
 #define SWITCH_TO_64BIT_MODE					 \
-	movl	$(CR4_PAE),%eax		                	  
-	movl	%eax,%cr4					  
-	movl    $MSR_IA32_EFER,%ecx				  
-	rdmsr							  
-	                          				  
-	orl	$(MSR_IA32_EFER_LME | MSR_IA32_EFER_NXE),%eax	  
-	wrmsr							  
-	movl	$EXT(BootPML4),%eax				  
-	movl	%eax,%cr3					  
-	movl	%cr0,%eax					  
-	orl	$(CR0_PG|CR0_WP),%eax	                   	  
-	movl	%eax,%cr0					  
-	ljmpl	$KERNEL64_CS,$64f				  
-64:								  
+	movl	$(CR4_PAE),%eax		                	;\
+	movl	%eax,%cr4					;\
+	movl    $MSR_IA32_EFER,%ecx				;\
+	rdmsr							;\
+	                          				;\
+	orl	$(MSR_IA32_EFER_LME | MSR_IA32_EFER_NXE),%eax	;\
+	wrmsr							;\
+	movl	$EXT(BootPML4),%eax				;\
+	movl	%eax,%cr3					;\
+	movl	%cr0,%eax					;\
+	orl	$(CR0_PG|CR0_WP),%eax	                   	;\
+	movl	%eax,%cr0					;\
+	ljmpl	$KERNEL64_CS,$64f				;\
+64:								;\
 	.code64
 
   
@@ -540,17 +540,17 @@ wake_restore:
 #define	cs_base_prefix		.byte 0x2e
 
 #define	LJMP(segment,address)			\
-	operand_size_prefix			  
-	.byte	0xea				  
-	.long	address-EXT(real_mode_bootstrap_base)	  
+	operand_size_prefix			;\
+	.byte	0xea				;\
+	.long	address-EXT(real_mode_bootstrap_base)	;\
 	.word	segment
 
 #define	LGDT(address)				\
-	cs_base_prefix				  
-	address_size_prefix			  
-	operand_size_prefix			  
-	.word	0x010f				  
-	.byte	0x15				  
+	cs_base_prefix				;\
+	address_size_prefix			;\
+	operand_size_prefix			;\
+	.word	0x010f				;\
+	.byte	0x15				;\
 	.long	address-EXT(real_mode_bootstrap_base)
 
 .section __HIB, __text
@@ -580,7 +580,7 @@ Entry(real_mode_bootstrap_base)
 	movw	%ax, %fs
 	movw	%ax, %gs
 
-	POSTCODE(SLAVE_STARTPROG_ENTRY) 
+	POSTCODE(SLAVE_STARTPROG_ENTRY);
 
 	mov	PROT_MODE_START+REAL_MODE_BOOTSTRAP_OFFSET, %ecx
 	jmp 	*%ecx

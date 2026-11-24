@@ -36,12 +36,12 @@
                                             
    
 #define COPY_STACK(src, count, tmpindex) \
-	mov	$0, tmpindex	                                 
+	mov	$0, tmpindex	                              ; \
 1: \
-	mov	0(src,tmpindex,1), %rax	                                              
-	mov	%rax, 0(%rsp,tmpindex,1)                       
-	add	$8, tmpindex		                            
-	cmp	count, tmpindex		                                        
+	mov	0(src,tmpindex,1), %rax	                                           ; \
+	mov	%rax, 0(%rsp,tmpindex,1)                    ; \
+	add	$8, tmpindex		                         ; \
+	cmp	count, tmpindex		                                     ; \
 	jne 1b
 	
   

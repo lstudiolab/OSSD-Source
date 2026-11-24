@@ -38,9 +38,9 @@ L__current_pid_addr:
 
 #if defined(__DYNAMIC__)
 #define GET_CURRENT_PID				\
-	call	0f				   
-0:						   
-	popl	%ecx				   
+	call	0f				; \
+0:						; \
+	popl	%ecx				; \
 	leal	L__current_pid_addr-0b(%ecx), %ecx
 
 #define __current_pid (%ecx)

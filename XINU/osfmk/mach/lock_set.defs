@@ -29,33 +29,33 @@
  * @OSF_COPYRIGHT@
  * 
  */
-/*
- *	File: mach/lock_set.defs
- *	Author: Joseph CaraDonna
- *
- *	Exported kernel calls	
- *
- */
+  
+                           
+                           
+  
+                         
+  
+   
 
 subsystem
 #if	KERNEL_SERVER
 	KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 			lock_set 617000;
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 
-/*
- * OBSOLETE interfaces
- * a lock_set_t is created and destroyed through the task object.
- *      lock_set_create(task,&lock_set_t,...);
- *      lock_set_destroy(task,lock_set_t);
- */
+  
+                      
+                                                                 
+                                              
+                                          
+   
 
-/*
- * OBSOLETE interfaces
- */
+  
+                      
+   
 routine lock_acquire(
 		lock_set	: lock_set_t;
 		lock_id		: int);
@@ -80,4 +80,4 @@ routine lock_handoff_accept(
 		lock_set	: lock_set_t;
 		lock_id		: int);
 
-/* vim: set ft=c : */
+                     

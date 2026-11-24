@@ -20,28 +20,28 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-inline int UT_VFORK = 0x02000000;  /* thread has vfork children */
+inline int UT_VFORK = 0x02000000;                                 
 #pragma D binding "1.0" UT_VFORK
 
-inline uthread_t uthread = (mach_kernel`uthread_t)(curthread->uthread); /* ` */
+inline uthread_t uthread = (mach_kernel`uthread_t)(curthread->uthread);        
 #pragma D binding "1.0" uthread
 
 inline struct proc * curproc = 
 	(uthread && (uthread->uu_flag & UT_VFORK) && uthread->uu_proc) ? (struct proc *)uthread->uu_proc :
 	((struct proc *)(curthread->task->bsd_info)) != NULL ? ((struct proc *)(curthread->task->bsd_info)) : 
-	mach_kernel`kernproc; /* ` */
+	mach_kernel`kernproc;        
 #pragma D binding "1.0" curproc
 
-/*
- * curthread->thread_tag will have this set if the thread is the main thread
- */   
+  
+                                                                            
+      
 inline uint32_t THREAD_TAG_MAINTHREAD = 0x1;
 inline uint32_t THREAD_TAG_CALLOUT = 0x2;
 inline uint32_t THREAD_TAG_IOWORKLOOP = 0x4;
 
-/*
- * mach thread scheduler state
- */
+  
+                              
+   
 inline int TH_WAIT		= 0x01;
 #pragma D binding "1.0" TH_WAIT
 inline int TH_SUSP		= 0x02;
@@ -57,10 +57,10 @@ inline int TH_TERMINATE2	= 0x20;
 inline int TH_IDLE		= 0x80;
 #pragma D binding "1.0" TH_IDLE
 
-/*
- * The following miscellaneous constants are used by the proc(4) translators
- * defined below.
- */
+  
+                                                                            
+                 
+   
 inline char SIDL = 1;
 #pragma D binding "1.0" SIDL
 inline char SRUN = 2;
@@ -71,17 +71,17 @@ inline char SSTOP = 4;
 #pragma D binding "1.0" SSTOP
 inline char SZOMB = 5;
 #pragma D binding "1.0" SZOMB
-/*
- * SONPROC defined here for compatability with ported scripts
- */
+  
+                                                             
+   
 inline char SONPROC = 6;
 #pragma D binding "1.0" SONPROC
 
 inline char SOBJ_NONE = 0;
 #pragma D binding "1.0" SOBJ_NONE
-/*
- * SOBJ_* defined here for compatability with ported scripts
- */
+  
+                                                            
+   
 inline char SOBJ_MUTEX = 1;
 #pragma D binding "1.0" SOBJ_MUTEX
 inline char SOBJ_RWLOCK = 2;
@@ -102,9 +102,9 @@ inline char PR_MODEL_ILP32 = 1;
 inline char PR_MODEL_LP64 = 2;
 #pragma D binding "1.0" PR_MODEL_LP64
 
-/*
- * PR_* defined here for compatability with ported scripts
- */
+  
+                                                          
+   
 inline int PR_STOPPED = 0x00000001;
 #pragma D binding "1.0" PR_STOPPED
 inline int PR_ISTOP = 0x00000002;
@@ -150,49 +150,49 @@ inline int PR_MSFORK = 0x08000000;
 inline int PR_IDLE = 0x10000000;
 #pragma D binding "1.0" PR_IDLE
 
-/*
- * Translate from the kernel's proc_t structure to a proc(4) psinfo_t struct.
- * We do not provide support for pr_size, pr_rssize, pr_pctcpu, and pr_pctmem.
- * We also do not fill in pr_lwp (the lwpsinfo_t for the representative LWP)
- * because we do not have the ability to select and stop any representative.
- * Also, for the moment, pr_wstat, pr_time, and pr_ctime are not supported,
- * but these could be supported by DTrace in the future using subroutines.
- * Note that any member added to this translator should also be added to the
- * kthread_t-to-psinfo_t translator, below.
- */
+  
+                                                                             
+                                                                              
+                                                                            
+                                                                            
+                                                                           
+                                                                          
+                                                                            
+                                           
+   
 typedef int taskid_t;
 typedef int projid_t;
 typedef int poolid_t;
-typedef struct timespec timestruc_t; /* (SECONDS, NANOSECONDS) */
+typedef struct timespec timestruc_t;                             
 
 typedef struct psinfo {
-	int	pr_nlwp;	/* number of active lwps in the process */
-	pid_t	pr_pid;		/* unique process id */
-	pid_t	pr_ppid;	/* process id of parent */
-	pid_t	pr_pgid;	/* pid of process group leader */
-	pid_t	pr_sid;		/* session id */
-	uid_t	pr_uid;		/* real user id */
-	uid_t	pr_euid;	/* effective user id */
-	gid_t	pr_gid;		/* real group id */
-	gid_t	pr_egid;	/* effective group id */
-	uintptr_t pr_addr;	/* address of process */
-	dev_t	pr_ttydev;	/* controlling tty device (or PRNODEV) */
-	timestruc_t pr_start;/* process start time, DEPRECATED, see pr_start_tv below */
-	char pr_fname[16];	/* name of execed file */
-	char pr_psargs[80];	/* initial characters of arg list */
-	int pr_argc;    	/* initial argument count */
-	user_addr_t pr_argv;  /* address of initial argument vector */
-	user_addr_t pr_envp;  /* address of initial environment vector */
-	char    pr_dmodel;  /* data model of the process */
-	taskid_t pr_taskid; /* task id */
-	projid_t pr_projid; /* project id */
-	poolid_t pr_poolid; /* pool id */
-	zoneid_t pr_zoneid; /* zone id */
+	int	pr_nlwp;	                                          
+	pid_t	pr_pid;		                       
+	pid_t	pr_ppid;	                          
+	pid_t	pr_pgid;	                                 
+	pid_t	pr_sid;		                
+	uid_t	pr_uid;		                  
+	uid_t	pr_euid;	                       
+	gid_t	pr_gid;		                   
+	gid_t	pr_egid;	                        
+	uintptr_t pr_addr;	                        
+	dev_t	pr_ttydev;	                                         
+	timestruc_t pr_start;                                                           
+	char pr_fname[16];	                         
+	char pr_psargs[80];	                                    
+	int pr_argc;    	                            
+	user_addr_t pr_argv;                                          
+	user_addr_t pr_envp;                                             
+	char    pr_dmodel;                                 
+	taskid_t pr_taskid;              
+	projid_t pr_projid;                 
+	poolid_t pr_poolid;              
+	zoneid_t pr_zoneid;              
 
-	struct timeval pr_start_tv; /* process start time, from the epoch (SECONDS, MICROSECONDS) */
+	struct timeval pr_start_tv;                                                                 
 } psinfo_t;
 
-inline int P_LP64 = 0x00000004;  /* Process is LP64 */
+inline int P_LP64 = 0x00000004;                       
 #pragma D binding "1.0" P_LP64
 
 #pragma D binding "1.0" translator
@@ -211,14 +211,14 @@ translator psinfo_t < struct proc * P > {
 	pr_ttydev = (P->p_pgrp->pg_session->s_ttyvp == NULL) ? (dev_t)-1 :
 		P->p_pgrp->pg_session->s_ttyp->t_dev;
 
-	/*
-	 * timestruct_t (SECONDS, NANOSECONDS) is not available directly nor can a further translation
-	 * be specified here. Zero the structure. Use pr_start_tv instead.
-	 */
-	pr_start = *((timestruc_t *)`dtrace_zero); /* ` */
+	  
+                                                                                               
+                                                                   
+    
+	pr_start = *((timestruc_t *)`dtrace_zero);        
 
 	pr_fname = 	P->p_comm;
-	pr_psargs = P->p_comm; /* XXX omits command line arguments XXX */
+	pr_psargs = P->p_comm;                                           
 	pr_argc = P->p_argc;
 	pr_argv = P->p_dtrace_argv;
 	pr_envp = P->p_dtrace_envp;
@@ -230,20 +230,20 @@ translator psinfo_t < struct proc * P > {
 	pr_poolid = 0;
 	pr_zoneid = 0;
 
-	/*
-	 * pstats->pstart is a struct timeval: (SECONDS, MICROSECONDS).
-	 */
+	  
+                                                                
+    
 	pr_start_tv = P->p_start;
 };
 
-/*
- * Translate from the kernel's kthread_t structure to a proc(4) psinfo_t
- * struct.  Lacking a facility to define one translator only in terms of
- * another, we explicitly define each member by using the proc_t-to-psinfo_t
- * translator, above; any members added to that translator should also be
- * added here.  (The only exception to this is pr_start, which -- due to it
- * being a structure -- cannot be defined in terms of a translator at all.)
- */
+  
+                                                                        
+                                                                        
+                                                                            
+                                                                         
+                                                                           
+                                                                           
+   
 #pragma D binding "1.0" translator
 translator psinfo_t < thread_t T > {
 	pr_nlwp = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_nlwp;
@@ -259,7 +259,7 @@ translator psinfo_t < thread_t T > {
 	pr_ttydev = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_ttydev;
 	pr_start = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_start; 
 	pr_fname = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_fname;
-	pr_psargs = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_psargs; /* XXX omits command line arguments XXX */
+	pr_psargs = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_psargs;                                           
 	pr_argc = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_argc;
 	pr_argv = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_argv;
 	pr_envp = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_envp;
@@ -272,12 +272,12 @@ translator psinfo_t < thread_t T > {
 	pr_start_tv = xlate <psinfo_t> ((struct proc *)(T->task->bsd_info)).pr_start_tv; 
 };
 
-/*
- * Translate from the kernel's kthread_t structure to a proc(4) lwpsinfo_t.
- * We do not provide support for pr_nice, pr_oldpri, pr_cpu, or pr_pctcpu.
- * Also, for the moment, pr_start and pr_time are not supported, but these
- * could be supported by DTrace in the future using subroutines.
- */
+  
+                                                                           
+                                                                          
+                                                                          
+                                                                
+   
 
 inline processor_t PROCESSOR_NULL = ((processor_t) 0);
 #pragma D binding "1.0" PROCESSOR_NULL
@@ -285,30 +285,30 @@ inline processor_t PROCESSOR_NULL = ((processor_t) 0);
 typedef int psetid_t;
 
 typedef struct lwpsinfo {
-	int	pr_flag;	/* lwp flags (DEPRECATED; do not use) */
-	id_t	pr_lwpid;	/* lwp id */
-	uintptr_t pr_addr;	/* internal address of lwp */
-	uintptr_t pr_wchan;	/* wait addr for sleeping lwp */
-	char	pr_stype;	/* synchronization event type */
-	char	pr_state;	/* numeric lwp state */
-	char	pr_sname;	/* printable character for pr_state */
-	short	pr_syscall;	/* system call number (if in syscall) */
-	int	pr_pri;		/* priority, high value is high priority */
-	char	pr_clname[8];	/* scheduling class name */
-	int	pr_thstate;		/* mach thread scheduler state */
-	processorid_t pr_onpro;		/* processor which last ran this lwp */
-	processorid_t pr_bindpro;	/* processor to which lwp is bound */
-	psetid_t pr_bindpset;	/* processor set to which lwp is bound */
+	int	pr_flag;	                                        
+	id_t	pr_lwpid;	            
+	uintptr_t pr_addr;	                             
+	uintptr_t pr_wchan;	                                
+	char	pr_stype;	                                
+	char	pr_state;	                       
+	char	pr_sname;	                                      
+	short	pr_syscall;	                                        
+	int	pr_pri;		                                           
+	char	pr_clname[8];	                           
+	int	pr_thstate;		                                 
+	processorid_t pr_onpro;		                                       
+	processorid_t pr_bindpro;	                                     
+	psetid_t pr_bindpset;	                                         
 } lwpsinfo_t;
 
 #pragma D binding "1.0" translator
 translator lwpsinfo_t < thread_t T > {
-	pr_flag = 0; /* lwp flags (DEPRECATED; do not use) */
+	pr_flag = 0;                                         
 	pr_lwpid = (id_t)T->thread_id;
 	pr_addr = (uintptr_t)T;
 	pr_wchan = (uintptr_t)(((uthread_t)(T->uthread))->uu_wchan);
 
-	pr_stype = SOBJ_NONE; /* XXX Undefined synch object (or none) XXX */
+	pr_stype = SOBJ_NONE;                                               
 	pr_state = curproc->p_stat;
 	pr_sname = (curproc->p_stat == SIDL) ? 'I' :
 			(curproc->p_stat == SRUN) ? 'R' :
@@ -323,8 +323,8 @@ translator lwpsinfo_t < thread_t T > {
 			(T->sched_mode & 0x0002) ? "TS" : "SYS";
 
 	pr_onpro = (T->last_processor == PROCESSOR_NULL) ? -1 : T->last_processor->cpu_id;
-	pr_bindpro = -1; /* Darwin does not bind threads to processors. */
-	pr_bindpset = -1; /* Darwin does not partition processors. */
+	pr_bindpro = -1;                                                  
+	pr_bindpset = -1;                                            
 	pr_thstate = T->state;
 };
 
@@ -336,13 +336,13 @@ inline lwpsinfo_t *curlwpsinfo = xlate <lwpsinfo_t *> (curthread);
 #pragma D attributes Stable/Stable/Common curlwpsinfo
 #pragma D binding "1.0" curlwpsinfo
 
-/* XXX Really want vn_getpath(curproc->p_fd->fd_cdir, , ) but that takes namecache_rw_lock XXX */
+                                                                                                 
 inline string cwd = curproc->p_fd->fd_cdir->v_name == NULL ?
 	"<unknown>" : stringof(curproc->p_fd->fd_cdir->v_name);
 #pragma D attributes Stable/Stable/Common cwd
 #pragma D binding "1.0" cwd
 
-/* XXX Really want vn_getpath(curproc->p_fd->fd_rdir, , ) but that takes namecache_rw_lock XXX */
+                                                                                                 
 inline string root = curproc->p_fd->fd_rdir == NULL ? "/" :
 	curproc->p_fd->fd_rdir->v_name == NULL ? "<unknown>" :
 	stringof(curproc->p_fd->fd_rdir->v_name);

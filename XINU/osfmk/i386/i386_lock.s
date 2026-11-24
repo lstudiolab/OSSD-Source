@@ -44,7 +44,7 @@
 
 #include "assym.s"
 
-#define	PAUSE		rep     
+#define	PAUSE		rep; nop
 
 #include <i386/pal_lock_asm.h>
 
@@ -56,11 +56,11 @@
 
                                                          
                                                              
-#define ALIGN_STACK() 		and  $0xFFFFFFFFFFFFFFF0, %rsp  
-#define LOAD_STRING_ARG0(label)	leaq label(%rip), %rdi  
-#define LOAD_ARG1(x)		mov x, %esi  
-#define LOAD_PTR_ARG1(x)	mov x, %rsi  
-#define CALL_PANIC()		xorb %al,%al                    
+#define ALIGN_STACK() 		and  $0xFFFFFFFFFFFFFFF0, %rsp ;
+#define LOAD_STRING_ARG0(label)	leaq label(%rip), %rdi ;
+#define LOAD_ARG1(x)		mov x, %esi ;
+#define LOAD_PTR_ARG1(x)	mov x, %rsi ;
+#define CALL_PANIC()		xorb %al,%al ; call EXT(panic) ;
 
 #define PREEMPTION_DISABLE				\
 	incl	%gs:CPU_PREEMPTION_LEVEL
@@ -68,36 +68,36 @@
 #define	PREEMPTION_LEVEL_DEBUG 1	
 #if	PREEMPTION_LEVEL_DEBUG
 #define	PREEMPTION_ENABLE				\
-	decl	%gs:CPU_PREEMPTION_LEVEL	   
-	js	17f				   
-	jnz	19f				   
-	testl	$AST_URGENT,%gs:CPU_PENDING_AST	   
-	jz	19f				   
-	PUSHF					   
-	testl	$EFL_IF, S_PC			   
-	jz	18f				   
-	POPF					   
-	int	$(T_PREEMPT)			   
-	jmp	19f				   
+	decl	%gs:CPU_PREEMPTION_LEVEL	;	\
+	js	17f				;	\
+	jnz	19f				;	\
+	testl	$AST_URGENT,%gs:CPU_PENDING_AST	;	\
+	jz	19f				;	\
+	PUSHF					;	\
+	testl	$EFL_IF, S_PC			;	\
+	jz	18f				;	\
+	POPF					;	\
+	int	$(T_PREEMPT)			;	\
+	jmp	19f				;	\
 17:							\
-	call	_preemption_underflow_panic	   
+	call	_preemption_underflow_panic	;	\
 18:							\
-	POPF					   
+	POPF					;	\
 19:
 #else
 #define	PREEMPTION_ENABLE				\
-	decl	%gs:CPU_PREEMPTION_LEVEL	   
-	jnz	19f				   
-	testl	$AST_URGENT,%gs:CPU_PENDING_AST	   
-	jz	19f				   
-	PUSHF					   
-	testl	$EFL_IF, S_PC			   
-	jz	18f				   
-	POPF					   
-	int	$(T_PREEMPT)			   
-	jmp	19f				   
+	decl	%gs:CPU_PREEMPTION_LEVEL	;	\
+	jnz	19f				;	\
+	testl	$AST_URGENT,%gs:CPU_PENDING_AST	;	\
+	jz	19f				;	\
+	PUSHF					;	\
+	testl	$EFL_IF, S_PC			;	\
+	jz	18f				;	\
+	POPF					;	\
+	int	$(T_PREEMPT)			;	\
+	jmp	19f				;	\
 18:							\
-	POPF					   
+	POPF					;	\
 19:
 #endif
 
@@ -130,7 +130,7 @@ LEAF_ENTRY(hw_lock_byte_lock)
 	movb	(%rdi), %al		                          
 	testb	%al,%al			                  
 	jne	3f			                  
-	lock                                                          
+	lock; cmpxchg %cl,(%rdi)	                                     
 	jne	3f
 	LEAF_RET			                                     
 3:

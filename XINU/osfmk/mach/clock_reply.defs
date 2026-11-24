@@ -28,29 +28,29 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- *	File:		clock_reply.defs
- *	Purpose:	Kernel clock subsystem definitions. This
- *			file defines the clock reply interface.
- */
+  
+                          
+                                                    
+                                            
+   
 
 subsystem
 #if	KERNEL_USER
 	  KernelUser
-#endif	/* KERNEL_USER */
-		     clock_reply 3125107;  /* Matches up with old value */
+#endif	                 
+		     clock_reply 3125107;                                 
 
 #include <mach/std_types.defs>
 #include <mach/clock_types.defs>
 
 
-/*
- *	Reply routine for clock_alarm. 
- */
+  
+                                  
+   
 simpleroutine clock_alarm_reply(
                 alarm_port      : clock_reply_t;
 		alarm_code	: kern_return_t;
 		alarm_type	: alarm_type_t;
 		alarm_time	: mach_timespec_t);
 
-/* vim: set ft=c : */
+                     

@@ -1,8 +1,8 @@
-// To apply, at the top of xnu.git:
-// $ spatch --max-width=120 --use-gitgrep --in-place --include-headers --sp-file tools/cocci/os_atomic_normalize.cocci -dir .
-//
-// coccinelle insists on adding a space for (void) casts which can be fixed with:
-// $ git grep -l '(void) os_atomic' | xargs -n1 sed -i '' -e 's/(void) os_atomic/(void)os_atomic/'
+                                   
+                                                                                                                             
+  
+                                                                                 
+                                                                                                  
 
 @os_atomic@
 identifier fn =~ "^os_atomic";
@@ -91,4 +91,4 @@ expression A, B, C;
 + os_atomic_andnot_orig(E, F, m)
 )
 
-// vim:ft=diff:
+               

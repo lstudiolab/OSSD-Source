@@ -106,8 +106,8 @@ LEXT(_start)
 	ldr		r10, [r0, BA_MEM_SIZE]				                          
 
 #define LOAD_PHYS_ADDR(reg, label) \
-	LOAD_ADDR(reg, label)   
-	sub		reg, reg, r9   
+	LOAD_ADDR(reg, label); \
+	sub		reg, reg, r9; \
 	add		reg, reg, r8
 
 	                                                                       

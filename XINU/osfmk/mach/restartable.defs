@@ -29,7 +29,7 @@
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 	  task_restartable 8000;
 
 #include <mach/std_types.defs>
@@ -48,5 +48,5 @@ routine task_restartable_ranges_register(
 routine task_restartable_ranges_synchronize(
 		target_task : task_t);
 
-/* vim: set ft=c : */
+                     
 

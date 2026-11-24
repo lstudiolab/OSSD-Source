@@ -31,9 +31,9 @@
 
 #include <mach/std_types.defs>
 
-/*
- * UserNotification message types
-*/
+  
+                                 
+  
 
 type UNDMessage = c_string[*:1024];
 type UNDLabel = c_string[*:128];
@@ -43,9 +43,9 @@ type UNDPath = c_string[*:1024];
 
 type UNDXMLDict = c_string[*:2048];
 
-/*
- * serialized XML data
- */
+  
+                      
+   
 type xmlData    = ^ array [] of MACH_MSG_TYPE_BYTE
 	ctype : xmlData_t;
 
@@ -55,14 +55,14 @@ type UNDServerRef = mach_port_t;
 type UNDReplyRef = mach_port_t
 #if	KERNEL_SERVER
 		intran: UNDReplyRef convert_port_to_UNDReply(mach_port_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 #if	KERNEL_USER
 		ctype: mach_port_t
-#endif /* KERNEL_USER */
+#endif                  
 		;
 
 import <UserNotification/UNDTypes.h>;
 
-#endif /* _USERNOTIFICATION_UNDTYPES_DEFS_ */
+#endif                                       
 
-/* vim: set ft=c : */
+                     

@@ -64,7 +64,7 @@ struct	device cur;
 struct	device *curp = 0;
 char	*temp_id;
 char	*val_id;
-/* char	*malloc(); */
+                     
 
 int yylex(void);
 
@@ -79,7 +79,7 @@ Configuration:
 Many_specs:
 	Many_specs Spec
 		|
-	/* lambda */
+	            
 		;
 
 Spec:
@@ -157,7 +157,7 @@ Opt_value:
 	          (void) sprintf(nb, "%u", $1);
 	      	  $$ = val_id = ns(nb);
 	      } |
-	/* lambda from MIPS -- WHY */
+	                             
 	      { $$ = val_id = ns(""); }
 	      ;
 
@@ -230,7 +230,7 @@ Device_spec:
 		};
 
 Init_dev:
-	/* lambda */
+	            
 	      { init_dev(&cur); };
 
 %%
@@ -241,9 +241,9 @@ yyerror(const char *s)
 	fprintf(stderr, "config: line %d: %s\n", yyline, s);
 }
 
-/*
- * return the passed string in a new space
- */
+  
+                                          
+   
 char *
 ns(const char *str)
 {
@@ -254,9 +254,9 @@ ns(const char *str)
 	return (cp);
 }
 
-/*
- * add a device to the list of devices
- */
+  
+                                      
+   
 void
 newdev(struct device *dp)
 {

@@ -29,19 +29,19 @@
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		       mach_voucher_attr_control 5600;
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 
-/* Extract the given voucher-control's value-handle from the supplied voucher */
+                                                                                
 routine mach_voucher_attr_control_get_values(
 		control		: ipc_voucher_attr_control_t;
 		voucher		: ipc_voucher_t;
 	out	value_handles	: mach_voucher_attr_value_handle_array_t, CountInOut);
 
-/* Create a new voucher with the control's privilege (to directly assign value-handles) */
+                                                                                          
 routine mach_voucher_attr_control_create_mach_voucher(
 		control		: ipc_voucher_attr_control_t;
 		recipes		: mach_voucher_attr_raw_recipe_array_t;

@@ -2,14 +2,14 @@
  * Copyright (c) 2020, Apple Inc.  All rights reserved.
  */
 
- /*
- *  Interface definition for the telemetry facility.
- */
+   
+                                                    
+   
 
 subsystem
 #if	KERNEL_USER
     KernelUser
-#endif	/* KERNEL_USER */
+#endif	                 
     iocompressionstats_notification 5600;
 
 #include <mach/std_types.defs>

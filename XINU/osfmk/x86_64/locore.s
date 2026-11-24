@@ -83,22 +83,22 @@
 #endif
 
 #define	RECOVER_TABLE_START	\
-	.align 3		   
-	.globl	EXT(recover_table)   
-LEXT(recover_table)		  
+	.align 3		; \
+	.globl	EXT(recover_table) ;\
+LEXT(recover_table)		;\
 	.text
 
 #define	RECOVER(addr)		\
-	.align	3    
-	.quad	9f		  
-	.quad	addr		  
-	.text			  
+	.align	3;		\
+	.quad	9f		;\
+	.quad	addr		;\
+	.text			;\
 9:
 
 #define	RECOVER_TABLE_END		\
-	.align	3			  
-	.globl	EXT(recover_table_end)	  
-LEXT(recover_table_end)			  
+	.align	3			;\
+	.globl	EXT(recover_table_end)	;\
+LEXT(recover_table_end)			;\
 	.text
 
   

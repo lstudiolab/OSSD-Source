@@ -116,36 +116,36 @@ EXT(idt64_hndl_table1):
    
 #if DEBUG_IDT64
 #define IDT_ENTRY_WRAPPER(n, f)			 \
-	push	%rax				  
-	POSTCODE2(0x6400+n)			  
-	pop	%rax				  
-	pushq	$(f)				  
-	pushq	$(n)				  
+	push	%rax				;\
+	POSTCODE2(0x6400+n)			;\
+	pop	%rax				;\
+	pushq	$(f)				;\
+	pushq	$(n)				;\
 	jmp L_dispatch
 #else
 #define IDT_ENTRY_WRAPPER(n, f)			 \
-	pushq	$(f)				  
-	pushq	$(n)				  
+	pushq	$(f)				;\
+	pushq	$(n)				;\
 	jmp L_dispatch
 #endif
 
                                                                
 #define TRAP_ERR(n, f)				 \
-	Entry(f)				  
+	Entry(f)				;\
 	IDT_ENTRY_WRAPPER(n, HNDL_ALLTRAPS)
 
                    
 #define TRAP(n, f)				 \
-	Entry(f)				  
-	pushq	$0          			  
+	Entry(f)				;\
+	pushq	$0          			;\
 	IDT_ENTRY_WRAPPER(n, HNDL_ALLTRAPS)
 
 #define USER_TRAP TRAP
 
                   
 #define INTERRUPT(n)			 	\
-	Entry(_intr_ ## n)			  
-	pushq	$0          			  
+	Entry(_intr_ ## n)			;\
+	pushq	$0          			;\
 	IDT_ENTRY_WRAPPER(n, HNDL_ALLINTRS)
 
                                                                                 

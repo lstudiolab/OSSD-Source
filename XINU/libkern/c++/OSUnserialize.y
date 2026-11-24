@@ -26,35 +26,35 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*  OSUnserialize.y created by rsulack on Nov 21 1998 */
+                                                        
 
-// 		"classic" parser for unserializing OSContainer objects
-//
-//  XXX - this code should really be removed!
-//	- the XML format is now prefered
-//	- this code leaks on syntax errors, the XML doesn't
-//	- "classic" looks, reads, ... much better than XML :-(
-//	- well except the XML is more efficent on OSData
-//
-//
-// to build :
-//	bison -p OSUnserialize OSUnserialize.y
-//	head -50 OSUnserialize.y > OSUnserialize.cpp
-//	sed -e "s/stdio.h/stddef.h/" < OSUnserialize.tab.c >> OSUnserialize.cpp
-//
-//	when changing code check in both OSUnserialize.y and OSUnserialize.cpp
-//
-//
-//
-//
-//		 DO NOT EDIT OSUnserialize.tab.cpp!
-//
-//			this means you!
-//
-//
-//
-//
-//
+                                                           
+  
+                                             
+                                   
+                                                      
+                                                         
+                                                   
+  
+  
+             
+                                         
+                                               
+                                                                          
+  
+                                                                         
+  
+  
+  
+  
+                                       
+  
+                    
+  
+  
+  
+  
+  
 
      
 %{
@@ -66,10 +66,10 @@ typedef	struct object {
 	struct object	*next;
 	struct object	*prev;
 	void		*object;
-	int		size;		// for data
+	int		size;		           
 	union {
-		void	*key;		// for dictionary
-		long long offset;	// for offset
+		void	*key;		                 
+		long long offset;	             
 	} u;
 
 } object_t;
@@ -91,10 +91,10 @@ static OSObject *buildOSBoolean(object_t *o);
 static void rememberObject(int, object_t *);
 static OSObject *retrieveObject(int);
 
-// temp variable to use during parsing
+                                      
 static object_t *oo;
 
-// resultant object of parsed text
+                                  
 static OSObject	*parsedObject;
 
 #define YYSTYPE object_t *
@@ -158,9 +158,9 @@ realloc_impl(void *addr, size_t osize, size_t nsize)
 %token BOOLEAN
 %token SYNTAX_ERROR
      
-%% /* Grammar rules and actions follow */
+%%                                       
 
-input:	  /* empty */		{ parsedObject = (OSObject *)NULL; YYACCEPT; }
+input:	             		{ parsedObject = (OSObject *)NULL; YYACCEPT; }
 	| object		{ parsedObject = (OSObject *)$1;   YYACCEPT; }
 	| SYNTAX_ERROR		{ yyerror("syntax error");	   YYERROR; }
 	;
@@ -187,7 +187,7 @@ object:	  dict			{ $$ = (object_t *)buildOSDictionary($1); }
 				}
 	;
 
-//------------------------------------------------------------------------------
+                                                                                
 
 dict:	  '{' '}'		{ $$ = NULL; }
 	| '{' pairs '}'		{ $$ = $2; }
@@ -205,7 +205,7 @@ pair:	  object '=' object ';'	{ $$ = newObject();
 				}
 	;
 
-//------------------------------------------------------------------------------
+                                                                                
 
 array:	  '(' ')'		{ $$ = NULL; }
 	| '(' elements ')'	{ $$ = $2; }
@@ -229,7 +229,7 @@ elements: object		{ $$ = newObject();
 				}
 	;
 
-//------------------------------------------------------------------------------
+                                                                                
 
 offset:	  NUMBER ':' NUMBER	{ $$ = $1;
 				  $$->size = $3->u.offset;
@@ -237,17 +237,17 @@ offset:	  NUMBER ':' NUMBER	{ $$ = $1;
 				}
 	;
 
-//------------------------------------------------------------------------------
+                                                                                
 
 data:	  DATA
 	;
 
-//------------------------------------------------------------------------------
+                                                                                
 
 string:	  STRING
 	;
 
-//------------------------------------------------------------------------------
+                                                                                
 
 boolean:  BOOLEAN
 	;
@@ -272,7 +272,7 @@ static int		parseBufferIndex;
 static char yyerror_message[128];
 
 int
-yyerror(const char *s)  /* Called by yyparse on error */
+yyerror(const char *s)                                  
 {
 	snprintf(yyerror_message, sizeof(yyerror_message), "OSUnserialize: %s near line %d\n", s, lineNumber);
 	return 0;
@@ -288,20 +288,20 @@ yylex()
  top:
 	c = currentChar();
 
-	/* skip white space  */
+	                       
 	if (isSpace(c)) while ((c = nextChar()) != 0 && isSpace(c)) {};
 
-	/* skip over comments */
+	                        
 	if (c == '#') while ((c = nextChar()) != 0 && c != '\n') {};
 
-	/* keep track of line number, don't return \n's */
+	                                                  
 	if (c == '\n') {
 		lineNumber++;
 		(void)nextChar();
 		goto top;
 	}
 
-	/* parse boolean */
+	                   
 	if (c == '.') {
 		bool boolean = false;
 		if (nextChar() == 't') {
@@ -317,26 +317,26 @@ yylex()
 			if (nextChar() != 'e') return SYNTAX_ERROR;
 		}
 		if (nextChar() != '.') return SYNTAX_ERROR;
-		/* skip over dot */
+		                   
 		(void)nextChar();
 
 		yylval = (object_t *)boolean;
 		return BOOLEAN;
 	}
 
-	/* parse unquoted string */
+	                           
 	if (isAlpha(c)) {
 		int start, length;
 		char * tempString;
 
 		start = parseBufferIndex;
-		/* find end of string */
+		                        
 		while (isAlphaNumeric(c)) { 
 			c = nextChar();
 		}
 		length = parseBufferIndex - start;
 
-		/* copy to null terminated buffer */
+		                                    
 		tempString = (char *)malloc(length + 1);
 		if (tempString == NULL) {
 			printf("OSUnserialize: can't alloc temp memory\n");
@@ -348,7 +348,7 @@ yylex()
 		return STRING;
 	}
 
-	/* parse quoted string */
+	                         
 	if (c == '"' || c == '\'') {
 		int start, length;
 		char * tempString;

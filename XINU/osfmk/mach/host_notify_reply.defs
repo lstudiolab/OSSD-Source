@@ -29,7 +29,7 @@
 subsystem
 #if	KERNEL_USER
 		KernelUser
-#endif	/* KERN_USER */
+#endif	               
 			host_notify_reply 950;
 
 #include <mach/std_types.defs>
@@ -40,4 +40,4 @@ simpleroutine host_calendar_changed(
 simpleroutine host_calendar_set(
 		notify_port	: mach_port_move_send_once_t);
 
-/* vim: set ft=c : */
+                     

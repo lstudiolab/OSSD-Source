@@ -26,14 +26,14 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *  Interface definition for the sysdiagnose facility.
- */
+  
+                                                      
+   
 
 subsystem
 #if KERNEL_USER
     KernelUser
-#endif /* KERNEL_USER */
+#endif                  
     sysdiagnose_notification 31337;
 
 #include <mach/std_types.defs>
@@ -52,4 +52,4 @@ simpleroutine sysdiagnose_notification_with_audit_token(
               flags               : uint32_t;
               ServerAuditToken atoken : audit_token_t);
 
-/* vim: set ft=c : */
+                     

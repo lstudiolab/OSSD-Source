@@ -30,14 +30,14 @@
  * @APPLE_BSD_LICENSE_HEADER_END@
 */
 
-/*
- *  Interface definition for the audit logging facility.
- */
+  
+                                                        
+   
 
 subsystem
 #if	KERNEL_USER
     KernelUser
-#endif	/* KERNEL_USER */
+#endif	                 
     audit_triggers 123;
 
 #include <mach/std_types.defs>

@@ -26,10 +26,10 @@
 #pragma D depends_on provider sched
 
 struct _processor_info {
-    int pi_state;           /* processor state, see above */
-    char    pi_processor_type[32];  /* ASCII CPU type */
-    char    pi_fputypes[32];    /* ASCII FPU types */
-    int pi_clock;           /* CPU clock freq in MHz */
+    int pi_state;                                           
+    char    pi_processor_type[32];                      
+    char    pi_fputypes[32];                         
+    int pi_clock;                                      
 };
 
 typedef struct _processor_info _processor_info_t;
@@ -38,30 +38,30 @@ typedef int chipid_t;
 typedef int lgrp_id_t;
 
 struct cpuinfo {
-	processorid_t cpu_id;		/* CPU identifier */
-	psetid_t cpu_pset;		/* processor set identifier */
-	chipid_t cpu_chip;		/* chip identifier */
-	lgrp_id_t cpu_lgrp;		/* locality group identifer */
-	_processor_info_t cpu_info;	/* CPU information */
+	processorid_t cpu_id;		                    
+	psetid_t cpu_pset;		                              
+	chipid_t cpu_chip;		                     
+	lgrp_id_t cpu_lgrp;		                              
+	_processor_info_t cpu_info;	                     
 };
 
 typedef struct cpuinfo cpuinfo_t;
 
 translator cpuinfo_t < processor_t P > {
 	cpu_id = P->cpu_id;
-	cpu_pset = -1; /* Darwin does not partition processors. */
-	cpu_chip = P->cpu_id; /* XXX */
-	cpu_lgrp = 0; /* XXX */
-	cpu_info = *((_processor_info_t *)`dtrace_zero); /* ` */ /* XXX */
+	cpu_pset = -1;                                            
+	cpu_chip = P->cpu_id;          
+	cpu_lgrp = 0;          
+	cpu_info = *((_processor_info_t *)`dtrace_zero);                  
 }; 
 
 inline cpuinfo_t *curcpu = xlate <cpuinfo_t *> (curthread->last_processor);
 #pragma D attributes Stable/Stable/Common curcpu
 #pragma D binding "1.0" curcpu
 
-/*
- * XXX: 'cpu' is now a built-in variable in dtrace.
- */
+  
+                                                   
+   
 
 inline psetid_t pset = curcpu->cpu_pset;
 #pragma D attributes Stable/Stable/Common pset

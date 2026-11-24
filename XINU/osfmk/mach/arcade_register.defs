@@ -26,14 +26,14 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *  Interface definition for the fairplay upcall mechanism.
- */
+  
+                                                           
+   
 
 subsystem
 #if KERNEL_SERVER
     KernelServer
-#endif /* KERNEL_SERVER */
+#endif                    
     arcade_register 51471;
 
 #include <mach/std_types.defs>

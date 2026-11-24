@@ -32,17 +32,17 @@
 subsystem
 #if	KERNEL_USER
 	  KernelUser
-#endif	/* KERNEL_USER */
+#endif	                 
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		       ledger 5000;
 
 #ifdef	KERNEL_USER
 userprefix r_;
-#endif	/* KERNEL_USER */
+#endif	                 
 
 #include <mach/std_types.defs>
 #include <mach/mach_types.defs>
 
-/* vim: set ft=c : */
+                     

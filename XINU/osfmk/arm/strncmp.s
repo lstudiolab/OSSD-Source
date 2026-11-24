@@ -37,11 +37,11 @@
                                                                   
 
 #define ESTABLISH_FRAME        \
-	push   {r4-r7,lr}           
-	add     r7,     sp, #12     
+	push   {r4-r7,lr}         ;\
+	add     r7,     sp, #12   ;\
 	push   {r8,r10}
 #define CLEAR_FRAME            \
-	pop    {r8,r10}              
+	pop    {r8,r10}            ;\
 	pop    {r4-r7,lr}
 
 .align 3

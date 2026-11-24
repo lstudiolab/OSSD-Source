@@ -53,19 +53,19 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- * File:	device/device.defs
- * Author:	Douglas Orr
- *		Feb 10, 1988
- * Abstract:
- *	Mach device support.  Mach devices are accessed through
- *	block and character device interfaces to the kernel.
- */
+  
+                           
+                      
+                
+            
+                                                          
+                                                       
+   
 
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		       iokit 2800;
 
 #if IOKITSIMD || KERNEL_SERVER
@@ -101,7 +101,7 @@ type NDR_record_t         = struct[8] of char;
 type io_user_scalar_t     = uint64_t;
 type io_user_reference_t  = uint64_t;
 type io_scalar_inband_t   = array[*:16] of int;
-// must be the same type as OSAsyncReference
+                                            
 type io_async_ref_t 	  = array[*:8]  of natural_t;
 type io_scalar_inband64_t = array[*:16] of io_user_scalar_t;
 type io_async_ref64_t 	  = array[*:8]  of io_user_reference_t;
@@ -119,7 +119,7 @@ type io_scalar_inband_t   = array[*:16] of io_user_scalar_t;
 type io_async_ref_t 	  = array[*:8]  of io_user_reference_t;
 type io_scalar_inband64_t = array[*:16] of uint64_t;
 type io_async_ref64_t 	  = array[*:8]  of uint64_t;
-#endif // __LP64__
+#endif            
 
 type io_object_t = mach_port_t
 		ctype: mach_port_t
@@ -127,7 +127,7 @@ type io_object_t = mach_port_t
 		intran: io_object_t iokit_lookup_object_port(mach_port_t)
 		outtran: mach_port_t iokit_make_object_port(io_object_t)
 		destructor: iokit_remove_reference(io_object_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 type io_connect_t = mach_port_t
@@ -136,7 +136,7 @@ type io_connect_t = mach_port_t
 		intran: io_connect_t iokit_lookup_connect_port(mach_port_t)
 		outtran: mach_port_t iokit_make_connect_port(io_connect_t)
 		destructor: iokit_remove_connect_reference(io_connect_t)
-#endif	/* KERNEL_SERVER */
+#endif	                   
 		;
 
 routine io_object_get_class(
@@ -221,13 +221,13 @@ routine io_registry_entry_get_parent_iterator(
 	);
 
 skip;
-/* was routine io_service_open
-	    service		: io_object_t;
-	in  owningTask		: task_t;
-	in  connect_type	: uint32_t;
-	out connection		: io_connect_t
-	);
-*/
+                              
+                            
+                          
+                             
+                               
+   
+  
 
 routine io_service_close(
 	    connection		: io_connect_t
@@ -361,14 +361,14 @@ routine io_iterator_is_valid(
 	);
 
 skip;
-/* was routine io_make_matching(
-	    master_port		: mach_port_t;
-	in  of_type		: uint32_t;
-	in  options		: uint32_t;
-	in  input		: io_struct_inband_t;
-	out matching		: io_string_t
-	);
-*/
+                                
+                                
+                         
+                         
+                                 
+                            
+   
+  
 
 routine io_catalog_send_data(
 	    master_port		: mach_port_t;
@@ -581,7 +581,7 @@ routine io_service_open_extended(
 	);
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                               
 
 routine io_connect_map_memory_into_task(
 	    connection		: io_connect_t;
@@ -681,7 +681,7 @@ routine FUNC_NAME(io_service_add_notification_ool)(
     skip;
     skip;
 
-#endif /* IOKIT_ALL_IPC || __LP64__ */
+#endif                                
 
 routine io_registry_entry_get_registry_entry_id(
 	    registry_entry	: io_object_t;
@@ -725,7 +725,7 @@ routine io_service_set_authorization_id(
 	in  authorization_id	: uint64_t
 	);
 
-/* */
+     
 
 routine io_server_version(
 	    master_port		: mach_port_t;
@@ -831,6 +831,6 @@ routine io_registry_entry_get_property_bin_buf(
 	out properties		: io_buf_ptr_t, physicalcopy
 	);
 
-#endif /* IOKIT */
+#endif            
 
-/* vim: set ft=c : */
+                     

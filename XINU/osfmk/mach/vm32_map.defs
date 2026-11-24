@@ -53,18 +53,18 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/vm_map.defs
- *
- *	Exported kernel VM calls for 32-bit client tasks.
- */
+  
+   
+  
+                         
+  
+                                                    
+   
 
 subsystem
 #if	KERNEL_SERVER
 	  KernelServer
-#endif	/* KERNEL_SERVER */
+#endif	                   
 	  map 3800;
 
 serverprefix vm32_;
@@ -75,7 +75,7 @@ serverprefix vm32_;
 
 #ifdef VM32_SUPPORT
 
-/* See vm_map.defs for more information */
+                                          
 
 routine region(
                 target_task     : vm_map_t;
@@ -214,7 +214,7 @@ routine mapped_pages_info(
 		task		: vm_map_t;
 	out	pages		: page_address_array_t);
 
-skip; /* was vm_region_object_create */
+skip;                                  
 
 routine region_recurse(
                 target_task     : vm_map_t;
@@ -269,9 +269,9 @@ routine map_64(
 		max_protection	: vm_prot_t;
 		inheritance	: vm_inherit_t);
 
-skip; /* was vm_map_get_upl */
-skip; /* was vm_upl_map */
-skip; /* was vm_upl_unmap */
+skip;                         
+skip;                     
+skip;                       
 
 routine purgable_control(
 		target_task	: vm_map_t;
@@ -284,6 +284,6 @@ routine _map_exec_lockdown(
 		target_task : vm_map_t);
 
 
-#endif /* VM32_SUPPORT */
+#endif                   
 
-/* vim: set ft=c : */
+                     

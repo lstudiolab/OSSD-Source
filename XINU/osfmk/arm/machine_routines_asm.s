@@ -613,42 +613,42 @@ LEXT(set_context_id)
 
 
 #define	COPYIO_SET_RECOVER()						\
-	                          					  
-	stmfd		sp!, { r4, r5, r6 }				  
-	adr		r3, copyio_error				  
-	mrc		p15, 0, r12, c13, c0, 4				  
-	ldr		r4, [r12, TH_RECOVER]				  
+	                          					;\
+	stmfd		sp!, { r4, r5, r6 }				;\
+	adr		r3, copyio_error				;\
+	mrc		p15, 0, r12, c13, c0, 4				;\
+	ldr		r4, [r12, TH_RECOVER]				;\
 	str		r3, [r12, TH_RECOVER]
 
 #define COPYIO_TRY_KERNEL()								\
-	                                                                     		  
+	                                                                     		;\
 	mrc		p15, 0, r12, c13, c0, 4			                   
-	ldr		r3, [r12, ACT_MAP]						  
-	ldr		r3, [r3, MAP_PMAP]						  
-	LOAD_ADDR(ip, kernel_pmap_store)						  
-	cmp		r3, ip								  
+	ldr		r3, [r12, ACT_MAP]						;\
+	ldr		r3, [r3, MAP_PMAP]						;\
+	LOAD_ADDR(ip, kernel_pmap_store)						;\
+	cmp		r3, ip								;\
 	beq		copyio_kern_body
 
 #if __ARM_USER_PROTECT__
 #define	COPYIO_MAP_USER()					\
 	                                                          
-                                                   	  
-	mrs		r5, cpsr				  
-	cpsid		if					  
-	ldr		r3, [r12, ACT_UPTW_TTB]			  
-	mcr		p15, 0, r3, c2, c0, 0			  
-	msr		cpsr, r5				  
-	ldr		r3, [r12, ACT_ASID]			  
-	mcr		p15, 0, r3, c13, c0, 1			  
+                                                   	;\
+	mrs		r5, cpsr				;\
+	cpsid		if					;\
+	ldr		r3, [r12, ACT_UPTW_TTB]			;\
+	mcr		p15, 0, r3, c2, c0, 0			;\
+	msr		cpsr, r5				;\
+	ldr		r3, [r12, ACT_ASID]			;\
+	mcr		p15, 0, r3, c13, c0, 1			;\
 	isb
 #else
 #define	COPYIO_MAP_USER()
 #endif
 
-#define COPYIO_HEADER()							  
-	                       						  
-	cmp		r2, #0						  
-	moveq		r0, #0						  
+#define COPYIO_HEADER()							;\
+	                       						;\
+	cmp		r2, #0						;\
+	moveq		r0, #0						;\
 	bxeq		lr
 	
 .macro COPYIO_BODY
@@ -684,11 +684,11 @@ L$0_noerror:
 
 #if __ARM_USER_PROTECT__
 #define	COPYIO_UNMAP_USER()					\
-	mrc		p15, 0, r12, c13, c0, 4				  
-	ldr		r3, [r12, ACT_KPTW_TTB]				  
-	mcr		p15, 0, r3, c2, c0, 0				  
-	mov		r3, #0						  
-	mcr		p15, 0, r3, c13, c0, 1				  
+	mrc		p15, 0, r12, c13, c0, 4				;\
+	ldr		r3, [r12, ACT_KPTW_TTB]				;\
+	mcr		p15, 0, r3, c2, c0, 0				;\
+	mov		r3, #0						;\
+	mcr		p15, 0, r3, c13, c0, 1				;\
 	isb
 #else
 #define	COPYIO_UNMAP_USER()					\
@@ -696,8 +696,8 @@ L$0_noerror:
 #endif
 
 #define	COPYIO_RESTORE_RECOVER()					\
-	                                  			  
-	str		r4, [r12, TH_RECOVER]			  
+	                                  			;\
+	str		r4, [r12, TH_RECOVER]			;\
 	ldmfd		sp!, { r4, r5, r6 }
 
   
@@ -722,7 +722,7 @@ LEXT(copyinstr)
 	mov		r6, r3
 	adr     	r3, copyinstr_error			                          
 	mrc		p15, 0, r12, c13, c0, 4			                
-	ldr		r4, [r12, TH_RECOVER]				  
+	ldr		r4, [r12, TH_RECOVER]				;\
 	str		r3, [r12, TH_RECOVER]
 	COPYIO_MAP_USER()
 	mov		r12, #0							                                

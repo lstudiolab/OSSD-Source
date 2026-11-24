@@ -27,9 +27,9 @@
 #pragma D depends_on provider mptcp
 #pragma D depends_on provider ip
 
-/*
- * MPTCP Protocol Control Block.
- */
+  
+                                
+   
 inline int MPTCPS_CLOSED                = 0;
 #pragma D binding "1.0" MPTCPS_CLOSED
 inline int MPTCPS_LISTEN                = 1;
@@ -114,9 +114,9 @@ translator mptsinfo_t < struct mptcb *T > {
 	mptcb	     = T;
 };
 
-/*
- * Multipath Control Block.
- */
+  
+                           
+   
 inline int MPPCB_STATE_INUSE	= 1;
 #pragma D binding "1.0" MPPCB_STATE_INUSE
 inline int MPPCB_STATE_DEAD	= 2;
@@ -138,9 +138,9 @@ translator mppsinfo_t < struct mppcb *T> {
 	mppcb  = T;
 };
 
-/*
- * MPTCP Session.
- */
+  
+                 
+   
 typedef struct mptsesinfo {
 	uint16_t	numflows;
 	uint16_t	nummpcapflows;
@@ -158,9 +158,9 @@ translator mptsesinfo_t < struct mptses *T > {
 	mptses	      = T;
 };
 
-/*
- * MPTCP Subflow.
- */
+  
+                 
+   
 inline int MPTSF_ATTACHED       = 0x00001;
 #pragma D binding "1.0" MPTSF_ATTACHED
 inline int MPTSF_CONNECTING     = 0x00002;

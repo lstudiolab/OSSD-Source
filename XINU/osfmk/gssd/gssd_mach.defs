@@ -37,8 +37,8 @@ import <System/gssd/gssd_mach_types.h>;
 
 type gssd_mechtype = int32_t;
 type gssd_nametype = int32_t;
-type gssd_string = c_string[*:1024]; /* MAX_PRINC_STR must be < 1024 */
-type gssd_dstring = c_string[*:128]; /* MAX_DISPLAY_STR must be < 128 */
+type gssd_string = c_string[*:1024];                                   
+type gssd_dstring = c_string[*:128];                                    
 type gssd_byte_buffer = array [] of uint8_t;
 type gssd_verifier =  uint64_t;
 type gssd_gid_list = array [*:16] of uint32_t;

@@ -51,7 +51,7 @@
 LEAF(___fork, 0)
 	subl  $28, %esp                                                                     
 
-	movl 	$ SYS_fork,%eax                          
+	movl 	$ SYS_fork,%eax; 	                       
 	UNIX_SYSCALL_TRAP		                     
 	jnc	L1			                
 
@@ -66,7 +66,7 @@ L1:
 	
 	               
 	xorl	%eax,%eax	           
-	REG_TO_EXTERN(%eax, __current_pid) 
+	REG_TO_EXTERN(%eax, __current_pid);
 L2:
 	addl	$28, %esp                       
 	                                             
@@ -77,7 +77,7 @@ L2:
 LEAF(___fork, 0)
 	subq  $24, %rsp                                                  
 
-	movl 	$ SYSCALL_CONSTRUCT_UNIX(SYS_fork),%eax                         
+	movl 	$ SYSCALL_CONSTRUCT_UNIX(SYS_fork),%eax;                        
 	UNIX_SYSCALL_TRAP		                     
 	jnc	L1			                
 
