@@ -201,3 +201,119 @@ ossd_pci_update_command(ossd_pci_config_read_fn read_config,
 	write_config(context, bus, device, function, 0x04, command);
 	return 0;
 }
+
+/*
+ * Probe a BAR size using the PCI-defined all-ones mask procedure. This is
+ * intentionally separate from enumeration because config writes have side
+ * effects and require the caller to serialize the complete transaction.
+ */
+int
+ossd_pci_size_bar(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *context,
+    const struct ossd_pci_device *device, uint8_t bar_index,
+    struct ossd_pci_bar_info *result)
+{
+	uint16_t offset;
+	uint32_t command_status, original_low, original_high = 0;
+	uint32_t mask_low, mask_high = 0;
+	uint32_t disabled_command;
+	uint64_t address, mask, size;
+	uint8_t bar_count, is_64 = 0, type, prefetch = 0;
+	int restore_error = 0;
+
+	if (read_config == 0 || write_config == 0 || device == 0 ||
+	    result == 0 || device->device >= 32 || device->function >= 8)
+		return -1;
+
+	bar_count = device->header_type == 0 ? 6U :
+	    (device->header_type == 1 ? 2U : 0U);
+	if (bar_index >= bar_count) return -1;
+
+	offset = (uint16_t)(PCI_BAR0 + (uint16_t)bar_index * 4U);
+	command_status = read_config(context, device->bus, device->device,
+	    device->function, 0x04);
+	original_low = read_config(context, device->bus, device->device,
+	    device->function, offset);
+	if (command_status == PCI_ABSENT || original_low == PCI_ABSENT)
+		return -2;
+
+	if ((original_low & 1U) != 0) {
+		type = OSSD_PCI_BAR_IO;
+		address = (uint64_t)(original_low & ~3U);
+	} else {
+		uint32_t memory_type = (original_low >> 1) & 3U;
+		type = OSSD_PCI_BAR_MEMORY;
+		prefetch = (uint8_t)((original_low >> 3) & 1U);
+		if (memory_type == 3U) return -3;
+		if (memory_type == 2U) {
+			if (bar_index + 1U >= bar_count) return -3;
+			is_64 = 1;
+			original_high = read_config(context, device->bus,
+			    device->device, device->function,
+			    (uint16_t)(offset + 4U));
+			if (original_high == PCI_ABSENT) return -2;
+			address = ((uint64_t)original_high << 32) |
+			    (uint64_t)(original_low & ~0x0fU);
+		} else {
+			address = (uint64_t)(original_low & ~0x0fU);
+		}
+	}
+
+	/* Disable both decode paths while the sizing mask is sampled. */
+	disabled_command = (command_status & 0xffffU) & ~3U;
+	write_config(context, device->bus, device->device,
+	    device->function, 0x04, disabled_command);
+
+	if (is_64) {
+		write_config(context, device->bus, device->device,
+		    device->function, (uint16_t)(offset + 4U), 0xffffffffU);
+	}
+	write_config(context, device->bus, device->device,
+	    device->function, offset, 0xffffffffU);
+
+	mask_low = read_config(context, device->bus, device->device,
+	    device->function, offset);
+	if (is_64) {
+		mask_high = read_config(context, device->bus, device->device,
+		    device->function, (uint16_t)(offset + 4U));
+	}
+
+	/* Restore BARs before restoring decode. Restore even on bad masks. */
+	if (is_64) {
+		write_config(context, device->bus, device->device,
+		    device->function, (uint16_t)(offset + 4U), original_high);
+	}
+	write_config(context, device->bus, device->device,
+	    device->function, offset, original_low);
+	write_config(context, device->bus, device->device,
+	    device->function, 0x04, command_status & 0xffffU);
+	(void)restore_error;
+
+	if (mask_low == PCI_ABSENT || (is_64 && mask_high == PCI_ABSENT))
+		return -2;
+
+	if (type == OSSD_PCI_BAR_IO) {
+		mask = (uint64_t)(mask_low & ~3U);
+		size = ((~mask) & 0xffffffffULL) + 1ULL;
+	} else if (is_64) {
+		mask = ((uint64_t)mask_high << 32) |
+		    (uint64_t)(mask_low & ~0x0fU);
+		size = (~mask) + 1ULL;
+	} else {
+		mask = (uint64_t)(mask_low & ~0x0fU);
+		size = ((~mask) & 0xffffffffULL) + 1ULL;
+	}
+
+	if (mask == 0 || size == 0 || (size & (size - 1ULL)) != 0)
+		return -4;
+	if (address != 0 && (address & (size - 1ULL)) != 0)
+		return -5;
+
+	result->address = address;
+	result->size = size;
+	result->index = bar_index;
+	result->type = type;
+	result->is_64_bit = is_64;
+	result->prefetchable = prefetch;
+	return 0;
+}
