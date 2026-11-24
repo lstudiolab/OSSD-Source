@@ -150,7 +150,9 @@ uint32_t ossd_pci_scan(ossd_pci_config_read_fn read_config,
 /*
  * Scans an already-mapped PCIe ECAM region. mapped_base must map
  * region->base_address for (end_bus - start_bus + 1) MiB with device-memory
- * attributes. Mapping and ACPI MCFG/Device Tree discovery are platform work.
+ * attributes and at least 4-byte alignment. Mapping and ACPI MCFG/Device
+ * Tree discovery are platform work. Each access context must pair the mapping
+ * with the exact segment-specific region used to create it.
  */
 uint32_t ossd_pci_scan_ecam(volatile void *mapped_base,
     const struct ossd_pci_ecam_region *region, ossd_pci_device_fn found,
