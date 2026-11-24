@@ -11,6 +11,7 @@ on:
       - "XINU/osfmk/device/ossd_realtek_wifi_core.*"
       - "XINU/osfmk/device/ossd_realtek_wifi_firmware.*"
       - "XINU/osfmk/device/ossd_realtek_wifi_sha256.*"
+      - "XINU/osfmk/device/ossd_realtek_wifi_sha256.*"
       - "XINU/tests/ossd_realtek_wifi_match_test.c"
       - "XINU/tests/ossd_realtek_wifi_core_test.c"
       - "XINU/tests/ossd_realtek_wifi_firmware_test.c"
@@ -81,6 +82,7 @@ jobs:
             XINU/osfmk/device/ossd_realtek_wifi.c \
             XINU/osfmk/device/ossd_realtek_wifi_core.c \
             XINU/osfmk/device/ossd_realtek_wifi_firmware.c \
+            XINU/osfmk/device/ossd_realtek_wifi_sha256.c \
             XINU/tests/ossd_realtek_wifi_core_test.c \
             -o /tmp/ossd-realtek-core-test
           /tmp/ossd-realtek-core-test
@@ -91,6 +93,7 @@ jobs:
             -I XINU/osfmk \
             -I XINU/osfmk/device \
             XINU/osfmk/device/ossd_realtek_wifi_firmware.c \
+            XINU/osfmk/device/ossd_realtek_wifi_sha256.c \
             XINU/tests/ossd_realtek_wifi_firmware_test.c \
             -o /tmp/ossd-realtek-firmware-test
           /tmp/ossd-realtek-firmware-test
