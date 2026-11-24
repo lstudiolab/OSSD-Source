@@ -6,6 +6,8 @@ on:
       - "XINU/osfmk/device/ossd_dma.*"
       - "XINU/tests/ossd_dma_test.c"
       - "XINU/osfmk/device/ossd_pci.*"
+      - "XINU/osfmk/conf/files"
+      - "XINU/osfmk/conf/files"
       - "XINU/osfmk/device/ossd_pci_driver.*"
       - "XINU/tests/ossd_pci_driver_test.c"
       - "XINU/tests/ossd_pci_scan_test.c"
