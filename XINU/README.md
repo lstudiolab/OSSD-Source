@@ -42,8 +42,7 @@ tests.
 
 ## Hardware support policy
 
-Hardware support is implemented through maintainable native drivers and
-documented device identifiers. The initial laptop validation target is the
+Hardware support is implemented through maintainable native drivers and documented device identifiers. See [the driver architecture and roadmap](DRIVERS/README.md) for the bus, device-class, lifecycle, compatibility-database, and validation strategy. The initial laptop validation target is the
 HP ProBook 450 G6. Its Wi-Fi adapter varies by configuration; see
 [HARDWARE-SUPPORT.md](HARDWARE-SUPPORT.md).
 
