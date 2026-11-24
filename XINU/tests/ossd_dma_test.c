@@ -60,6 +60,8 @@ main(void)
 	assert(ossd_dma_sync_for_cpu(&ops, 0, &mapping, 512, 512,
 	    OSSD_DMA_FROM_DEVICE) == 0);
 	assert(device_syncs == 1 && cpu_syncs == 1);
+	assert(ossd_dma_sync_for_device(&ops, 0, &mapping, 0, 64,
+	    OSSD_DMA_FROM_DEVICE) == 0);
 	assert(ossd_dma_sync_for_cpu(&ops, 0, &mapping, 1000, 64,
 	    OSSD_DMA_FROM_DEVICE) == -1);
 	ossd_dma_release(&ops, 0, &mapping);
