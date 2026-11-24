@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/strip-xinu-comments.yml"
+      - ".github/scripts/strip_xinu_comments.py"
   workflow_dispatch:
 
 permissions:
