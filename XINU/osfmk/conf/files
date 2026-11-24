@@ -86,7 +86,7 @@ osfmk/kdp/kdp.c			optional config_kdp_interactive_debugging
 osfmk/kern/kern_stackshot.c	standard
 
 # OSSD generic DMA mapping and PCI resource primitives
-osfmk/device/ossd_dma.c\t\tstandard
+osfmk/device/ossd_dma.c		standard
 # OSSD generic PCI configuration-space discovery
 osfmk/device/ossd_pci.c		standard
 osfmk/device/ossd_pci_driver.c	standard
