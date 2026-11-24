@@ -249,6 +249,7 @@ main(void)
 		assert(info.address == 0x1200000000ULL && info.size == 0x1000000ULL);
 		assert(bar_low == 0x0000000cU && bar_high == 0x00000012U);
 		assert(bar_command == 0x0007U && bar_writes == 6);
+		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 1, &info) == -3);
 		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 6, &info) == -1);
 	}
 
