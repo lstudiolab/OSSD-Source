@@ -80,6 +80,98 @@ ossd_rtw_pci_match_device(const struct ossd_pci_device *device)
 	return 0;
 }
 
+/*
+ * USB product IDs are limited to WLAN interfaces and are matched on the
+ * vendor-specific interface tuple. These records identify candidates only.
+ */
+#define USB_VENDOR_REALTEK 0x0bdaU
+#define USB_IFACE_VENDOR_SPECIFIC 0xffU
+
+static const struct ossd_rtw_match rtw_usb_ids[] = {
+	{ OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_LEGACY, "RTL8723AU", "rtl8723aufw.bin" },
+	{ OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_LEGACY, "RTL8192EU", "rtl8192eufw.bin" },
+	{ OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_LEGACY, "RTL8723BU", "rtl8723bufw.bin" },
+	{ OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_LEGACY, "RTL8192CU", "rtl8192cufw.bin" },
+	{ OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88, "RTL8821CU", "rtw88/rtw8821c_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88, "RTL8723DU", "rtw88/rtw8723d_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW89, "RTL8852AU", "rtw89/rtw8852a_fw.bin" }
+};
+
+static const uint16_t rtw_usb_products[] = {
+	0x8724, 0x1724, 0x0724, 0x818b, 0xb720, 0x8176, 0x8178,
+	0x817f, 0x8179, 0xf179, 0xb711, 0xf192, 0x2006, 0xc811,
+	0x8731, 0x8811, 0xb820, 0xb82b, 0xc80c, 0xc811, 0xc820,
+	0xc821, 0xc82a, 0xc82b, 0x8832, 0x885a, 0x885c
+};
+
+/*
+ * SDIO vendor/device identifiers are from the public SDIO ID registry.
+ * They are not proof that the corresponding silicon backend is implemented.
+ */
+#define SDIO_VENDOR_REALTEK 0x024cU
+static const struct ossd_rtw_sdio_device rtw_sdio_ids[] = {
+	{ SDIO_VENDOR_REALTEK, 0xb723 }, { SDIO_VENDOR_REALTEK, 0xd723 },
+	{ SDIO_VENDOR_REALTEK, 0xb821 }, { SDIO_VENDOR_REALTEK, 0xc821 },
+	{ SDIO_VENDOR_REALTEK, 0xd821 }, { SDIO_VENDOR_REALTEK, 0xb822 },
+	{ SDIO_VENDOR_REALTEK, 0xc822 }
+};
+static const struct ossd_rtw_match rtw_sdio_matches[] = {
+	{ OSSD_RTW_TRANSPORT_SDIO, OSSD_RTW_FAMILY_RTW88, "RTL8723BS", "rtw88/rtw8723b_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_SDIO, OSSD_RTW_FAMILY_RTW88, "RTL8723DS", "rtw88/rtw8723d_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_SDIO, OSSD_RTW_FAMILY_RTW88, "RTL8821BS", "rtw88/rtw8821b_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_SDIO, OSSD_RTW_FAMILY_RTW88, "RTL8821CS", "rtw88/rtw8821c_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_SDIO, OSSD_RTW_FAMILY_RTW88, "RTL8821DS", "rtw88/rtw8821d_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_SDIO, OSSD_RTW_FAMILY_RTW88, "RTL8822BS", "rtw88/rtw8822b_fw.bin" },
+	{ OSSD_RTW_TRANSPORT_SDIO, OSSD_RTW_FAMILY_RTW88, "RTL8822CS", "rtw88/rtw8822c_fw.bin" }
+};
+
+const struct ossd_rtw_match *
+ossd_rtw_usb_match_device(const struct ossd_rtw_usb_device *device)
+{
+	uint32_t i;
+	if (device == 0 || device->vendor_id != USB_VENDOR_REALTEK ||
+	    device->interface_class != USB_IFACE_VENDOR_SPECIFIC ||
+	    device->interface_subclass != USB_IFACE_VENDOR_SPECIFIC ||
+	    device->interface_protocol != USB_IFACE_VENDOR_SPECIFIC) {
+		return 0;
+	}
+	for (i = 0; i < sizeof(rtw_usb_products) / sizeof(rtw_usb_products[0]); i++) {
+		if (device->product_id == rtw_usb_products[i]) {
+			/* Product-to-family is intentionally resolved only for known groups. */
+			static const struct ossd_rtw_match legacy =
+			    { OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_LEGACY, "RTL8xxx USB", "rtl8xxxu-firmware" };
+			static const struct ossd_rtw_match rtw88 =
+			    { OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW88, "RTW88 USB", "rtw88-firmware" };
+			static const struct ossd_rtw_match rtw89 =
+			    { OSSD_RTW_TRANSPORT_USB, OSSD_RTW_FAMILY_RTW89, "RTW89 USB", "rtw89-firmware" };
+			if (device->product_id == 0x2006 || device->product_id == 0xc811 ||
+			    device->product_id == 0x8731 || device->product_id == 0x8811 ||
+			    device->product_id == 0xb820 || device->product_id == 0xb82b ||
+			    device->product_id == 0xc80c || device->product_id == 0xc820 ||
+			    device->product_id == 0xc821 || device->product_id == 0xc82a ||
+			    device->product_id == 0xc82b) return &rtw88;
+			if (device->product_id == 0x8832 || device->product_id == 0x885a ||
+			    device->product_id == 0x885c) return &rtw89;
+			return &legacy;
+		}
+	}
+	return 0;
+}
+
+const struct ossd_rtw_match *
+ossd_rtw_sdio_match_device(const struct ossd_rtw_sdio_device *device)
+{
+	uint32_t i;
+	if (device == 0) return 0;
+	for (i = 0; i < sizeof(rtw_sdio_ids) / sizeof(rtw_sdio_ids[0]); i++) {
+		if (device->vendor_id == rtw_sdio_ids[i].vendor_id &&
+		    device->device_id == rtw_sdio_ids[i].device_id) {
+			return &rtw_sdio_matches[i];
+		}
+	}
+	return 0;
+}
+
 const char *
 ossd_rtw_family_name(enum ossd_rtw_family family)
 {
