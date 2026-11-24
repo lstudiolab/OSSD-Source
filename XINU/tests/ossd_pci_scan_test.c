@@ -67,6 +67,44 @@ command_write(void *context, uint8_t bus, uint8_t device, uint8_t function,
 	command_register = value;
 }
 
+
+static uint32_t bar_command = 0x0007U;
+static uint32_t bar_low = 0xfebf0000U;
+static uint32_t bar_high;
+static uint32_t bar_mask_low = 0xffff0000U;
+static uint32_t bar_mask_high;
+static uint32_t bar_writes;
+static int bar_sizing;
+
+static uint32_t
+bar_read(void *context, uint8_t bus, uint8_t device, uint8_t function,
+    uint16_t offset)
+{
+	(void)context; (void)bus; (void)device; (void)function;
+	switch (offset) {
+	case 0x04: return bar_command;
+	case 0x10: return bar_sizing ? bar_mask_low : bar_low;
+	case 0x14: return bar_sizing ? bar_mask_high : bar_high;
+	default: return 0xffffffffU;
+	}
+}
+
+static void
+bar_write(void *context, uint8_t bus, uint8_t device, uint8_t function,
+    uint16_t offset, uint32_t value)
+{
+	(void)context; (void)bus; (void)device; (void)function;
+	bar_writes++;
+	if (offset == 0x04) {
+		bar_command = value;
+	} else if (offset == 0x10) {
+		bar_sizing = value == 0xffffffffU;
+		if (!bar_sizing) bar_low = value;
+	} else if (offset == 0x14) {
+		if (value != 0xffffffffU) bar_high = value;
+	}
+}
+
 struct test_state {
 	uint32_t count;
 	int found_network;
@@ -150,6 +188,45 @@ main(void)
 	assert(ossd_pci_update_command(command_read, command_write, 0, 0, 1, 0,
 	    OSSD_PCI_COMMAND_IO_SPACE, OSSD_PCI_COMMAND_IO_SPACE) == -1);
 	assert(ossd_pci_update_command(command_read, 0, 0, 0, 1, 0, 0, 0) == -1);
+
+	/* BAR sizing restores command and BAR registers after mask reads. */
+	{
+		struct ossd_pci_device d;
+		struct ossd_pci_bar_info info;
+		memset(&d, 0, sizeof(d));
+		d.header_type = 0;
+		d.device = 1;
+		d.function = 0;
+		bar_command = 0x0007U;
+		bar_low = 0xfebf0000U;
+		bar_high = 0;
+		bar_mask_low = 0xffff0000U; /* 64 KiB memory BAR */
+		bar_mask_high = 0;
+		bar_sizing = 0;
+		bar_writes = 0;
+		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 0, &info) == 0);
+		assert(info.type == OSSD_PCI_BAR_MEMORY && !info.is_64_bit);
+		assert(info.address == 0xfebf0000ULL && info.size == 0x10000ULL);
+		assert(bar_low == 0xfebf0000U && bar_command == 0x0007U);
+		assert(bar_writes == 3);
+
+		/* 64-bit prefetchable BAR consumes the following slot. */
+		bar_command = 0x0007U;
+		bar_low = 0x0000000cU;
+		bar_high = 0x00000012U;
+		bar_mask_low = 0xff00000cU;
+		bar_mask_high = 0xffffffffU;
+		bar_sizing = 0;
+		bar_writes = 0;
+		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 0, &info) == 0);
+		assert(info.type == OSSD_PCI_BAR_MEMORY && info.is_64_bit);
+		assert(info.prefetchable == 1);
+		assert(info.address == 0x1200000000ULL && info.size == 0x1000000ULL);
+		assert(bar_low == 0x0000000cU && bar_high == 0x00000012U);
+		assert(bar_command == 0x0007U && bar_writes == 5);
+		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 6, &info) == -1);
+	}
+
 	puts("XINU PCI and ECAM enumeration tests passed");
 	return 0;
 }
