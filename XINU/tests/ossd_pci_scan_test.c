@@ -208,7 +208,7 @@ main(void)
 		assert(info.type == OSSD_PCI_BAR_MEMORY && !info.is_64_bit);
 		assert(info.address == 0xfebf0000ULL && info.size == 0x10000ULL);
 		assert(bar_low == 0xfebf0000U && bar_command == 0x0007U);
-		assert(bar_writes == 3);
+		assert(bar_writes == 4);
 
 		/* 64-bit prefetchable BAR consumes the following slot. */
 		bar_command = 0x0007U;
@@ -223,7 +223,7 @@ main(void)
 		assert(info.prefetchable == 1);
 		assert(info.address == 0x1200000000ULL && info.size == 0x1000000ULL);
 		assert(bar_low == 0x0000000cU && bar_high == 0x00000012U);
-		assert(bar_command == 0x0007U && bar_writes == 5);
+		assert(bar_command == 0x0007U && bar_writes == 6);
 		assert(ossd_pci_size_bar(bar_read, bar_write, 0, &d, 6, &info) == -1);
 	}
 
