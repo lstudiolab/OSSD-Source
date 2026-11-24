@@ -138,8 +138,38 @@ the XINU source tree's applicable licensing obligations.
 
 ## Current implementation status
 
+### Implemented in the source tree
+
+- A transport-independent PCI function enumerator reads the standard 256-byte
+  configuration header through a supplied configuration-space accessor.
+- The scanner reports vendor/device IDs, class/subclass/programming interface,
+  revision, subsystem IDs, header type, interrupt pin/line, and BAR values.
+- It scans all 256 conventional bus numbers and discovers multifunction
+  devices. It performs read-only configuration access: it does not size BARs,
+  enable bus mastering, change command registers, or reprogram bridges.
+- An x86-64 PCI Configuration Mechanism #1 backend serializes CF8/CFC access.
+- The x86-64 I/O Kit platform expert runs an inventory pass and logs discovered
+  PCI functions during platform startup.
+- A host-side regression test and GitHub Actions workflow compile the generic
+  scanner with warnings treated as errors and exercise device/function
+  discovery and ID decoding.
+
+### Not yet implemented or verified
+
+- PCIe ECAM configuration-space access and ACPI MCFG/Device Tree host-bridge
+  discovery.
+- An arm64 PCI configuration backend. The generic scanner is portable, but
+  arm64 hardware enumeration is not yet wired to a configuration transport.
+- BAR sizing/allocation, bridge-window management, PCI resource arbitration,
+  MSI/MSI-X setup, IOMMU/DMA integration, and device power management.
+- Driver matching/binding and functional storage, network, audio, USB, display,
+  Bluetooth, and input drivers.
+- A complete XINU kernel build, boot test, and physical-hardware test.
+
+The host test validates the generic enumeration algorithm only. It does not
+validate privileged x86 port I/O, the full kernel build, PCIe ECAM, or physical
+hardware. Do not infer device support from the inventory log.
+
 The imported XNU-derived source tree provides substantial kernel and I/O Kit
 infrastructure, but this does not establish complete PC driver coverage.
-The hardware inventory must be audited against actual compiled driver sources.
-As of this roadmap, no claim is made that the HP ProBook 450 G6 Wi-Fi or audio
-paths, or broad third-party PC hardware coverage, are working.
+Broad compatibility remains an implementation target, not a current claim.
