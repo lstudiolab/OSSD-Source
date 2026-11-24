@@ -53,6 +53,27 @@ must have its own match record and test status.
   requires validation to pass before claiming hardware or loading firmware.
   No firmware manifest or binary is currently approved for a Realtek chipset.
 
+## PCIe firmware resolution update
+
+The PCIe candidate table now resolves a subset of known devices into the
+common firmware-validation tuple (transport, chipset family, chip name, and
+firmware filename). Initial explicit mappings cover RTL8821CE (B821/C821),
+RTL8822BE (B822), RTL8822CE (C822), and the listed RTW89 PCIe variants. RTL8812AE
+and RTL8821AE are classified as legacy rather than RTW88. Candidate IDs with
+no approved firmware mapping deliberately fail resolution instead of being
+passed to the firmware loader with an ambiguous image.
+
+A standalone host regression test covers positive mappings, unsupported
+candidate IDs, non-network PCI classes, unknown IDs, and invalid arguments.
+Run it from the repository root with:
+
+```sh
+sh XINU/DRIVERS/tests/run_realtek_pci_resolve.sh
+```
+
+This closes an identification/firmware-selection gap only. It does not add a
+chipset register backend, load a firmware image, or make any adapter functional.
+
 ## Existing XINU primitives and missing interfaces
 
 The source tree contains reusable BSD `ifnet` networking interfaces,

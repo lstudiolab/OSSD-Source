@@ -52,6 +52,7 @@ struct ossd_rtw_pci_match {
 	uint16_t subsystem_id;        /* 0xffff means any */
 	enum ossd_rtw_family family;
 	const char *chip_name;
+	const char *firmware_name; /* NULL until an approved image is mapped. */
 };
 
 /*
@@ -60,6 +61,11 @@ struct ossd_rtw_pci_match {
  */
 const struct ossd_rtw_pci_match *ossd_rtw_pci_match_device(
     const struct ossd_pci_device *device);
+/* Resolve a PCIe candidate into the common firmware-validation tuple.
+ * Returns 0 on a fully mapped chipset, -1 for invalid arguments, or -2
+ * when the candidate has no approved family/firmware mapping. */
+int ossd_rtw_pci_resolve_device(const struct ossd_pci_device *device,
+    struct ossd_rtw_match *result);
 const char *ossd_rtw_family_name(enum ossd_rtw_family family);
 const struct ossd_rtw_match *ossd_rtw_usb_match_device(
     const struct ossd_rtw_usb_device *device);
