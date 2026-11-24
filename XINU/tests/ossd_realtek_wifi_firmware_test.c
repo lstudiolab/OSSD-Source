@@ -52,6 +52,9 @@ int main(void)
 	manifest.filename = "../rtl8821ce.bin";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
 	    sizeof(blob) - 1) == -2);
+	manifest.filename = "..";
+	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
+	    sizeof(blob) - 1) == -2);
 	manifest.filename = "rtl8821ce.bin";
 	manifest.redistribution = OSSD_RTW_FIRMWARE_PROHIBITED;
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
@@ -65,7 +68,7 @@ int main(void)
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
 	    sizeof(blob) - 1) == -2);
 	manifest.sha256_hex = "debdc6fdb6c19c94ff78b653767bfac108d84ed51a54a58a72866dc635b15729";
-	manifest.source_uri = "x";
+	manifest.source_uri = "https:///firmware.bin";
 	assert(ossd_rtw_firmware_validate(&manifest, &match, 2, blob,
 	    sizeof(blob) - 1) == -2);
 	return 0;
