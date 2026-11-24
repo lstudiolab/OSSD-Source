@@ -56,6 +56,32 @@ int ossd_pci_update_command(ossd_pci_config_read_fn read_config,
     ossd_pci_config_write_fn write_config, void *context, uint8_t bus,
     uint8_t device, uint8_t function, uint16_t set_bits,
     uint16_t clear_bits);
+enum ossd_pci_bar_type {
+	OSSD_PCI_BAR_IO = 1,
+	OSSD_PCI_BAR_MEMORY = 2
+};
+
+struct ossd_pci_bar_info {
+	uint64_t address;
+	uint64_t size;
+	uint8_t index;
+	uint8_t type;
+	uint8_t is_64_bit;
+	uint8_t prefetchable;
+};
+
+/*
+ * Explicitly sizes one firmware-assigned BAR. This temporarily disables
+ * I/O and memory decoding, writes all ones to the selected BAR, reads its
+ * size mask, restores the original BAR values, then restores the command
+ * register. Caller must serialize config-space access for this function.
+ * It never assigns an address or enables bus mastering.
+ */
+int ossd_pci_size_bar(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *context,
+    const struct ossd_pci_device *device, uint8_t bar_index,
+    struct ossd_pci_bar_info *result);
+
 struct ossd_pci_ecam_region {
 	uint64_t base_address;
 	uint16_t segment;
