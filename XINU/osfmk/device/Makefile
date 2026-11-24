@@ -12,7 +12,7 @@ MIG_DEFS =	\
 MIG_HDRS = \
 
 DATAFILES = \
-	device_types.h device_port.h device_types.defs \
+	device_types.h device_port.h device_types.defs ossd_pci.h \
 	${MIG_DEFS}
 
 PRIVATE_DATAFILES = \
