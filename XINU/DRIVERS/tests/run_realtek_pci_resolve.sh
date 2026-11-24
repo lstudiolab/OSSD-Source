@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
-ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../../.." && pwd)
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 CC=${CC:-cc}
 OUT=${TMPDIR:-/tmp}/ossd-realtek-pci-resolve-test
 "$CC" -std=c11 -Wall -Wextra -Werror \
