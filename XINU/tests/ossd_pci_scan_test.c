@@ -49,6 +49,7 @@ struct test_state {
 	uint32_t count;
 	int found_network;
 	int found_bridge;
+	int found_ecam;
 };
 
 static void
@@ -65,6 +66,11 @@ record_device(void *context, const struct ossd_pci_device *device)
 		assert(device->bars[0] == 0xfebf0000U);
 		assert(device->interrupt_line == 11 && device->interrupt_pin == 1);
 		state->found_network = 1;
+	}
+	if (device->vendor_id == 0xabcd && device->device_id == 0x1000) {
+		assert(device->segment == 3 && device->bus == 5);
+		assert(device->device == 4 && device->function == 0);
+		state->found_ecam = 1;
 	}
 	if (device->vendor_id == 0x10ec && device->device_id == 0xc821) {
 		assert(device->bus == 0 && device->device == 2 &&
@@ -88,6 +94,26 @@ main(void)
 	assert(state.count == 3);
 	assert(state.found_network);
 	assert(state.found_bridge);
-	puts("XINU PCI enumeration tests passed");
+	{
+		static uint32_t ecam_memory[0x100000 / sizeof(uint32_t)];
+		struct ossd_pci_ecam_region region;
+		uint32_t *config = &ecam_memory[(4U << 15) / sizeof(uint32_t)];
+
+		memset(&state, 0, sizeof(state));
+		memset(ecam_memory, 0xff, sizeof(ecam_memory));
+		region.base_address = 0xe0000000ULL;
+		region.segment = 3;
+		region.start_bus = 5;
+		region.end_bus = 5;
+		config[0x00 / 4] = 0x1000abcdU;
+		config[0x08 / 4] = 0x01080001U;
+		config[0x0c / 4] = 0;
+		config[0x2c / 4] = 0x00000000U;
+		config[0x3c / 4] = 0;
+		assert(ossd_pci_scan_ecam(ecam_memory, &region,
+		    record_device, &state) == 1);
+		assert(state.count == 1 && state.found_ecam);
+	}
+	puts("XINU PCI and ECAM enumeration tests passed");
 	return 0;
 }
