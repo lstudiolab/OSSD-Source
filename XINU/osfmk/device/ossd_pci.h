@@ -117,6 +117,50 @@ int ossd_pci_mmio_write16(const struct ossd_pci_mmio_region *region,
 int ossd_pci_mmio_write32(const struct ossd_pci_mmio_region *region,
     uint64_t offset, uint32_t value);
 
+/*
+ * One-vector PCI MSI routing contract. The platform provider reserves an
+ * interrupt vector and supplies the architecture-specific MSI address/data
+ * (APIC on x86-64, GIC ITS/LPI or platform equivalent on arm64).
+ */
+struct ossd_pci_msi_message {
+	uint64_t address;
+	uint32_t data;
+	void *provider_cookie;
+};
+
+struct ossd_pci_msi_provider_ops {
+	int (*allocate)(void *context, struct ossd_pci_msi_message *message);
+	void (*release)(void *context,
+	    const struct ossd_pci_msi_message *message);
+};
+
+struct ossd_pci_msi_state {
+	struct ossd_pci_msi_message message;
+	uint16_t original_control;
+	uint16_t original_command;
+	uint32_t original_mask;
+	uint8_t capability_offset;
+	uint8_t mask_register_offset;
+	uint8_t has_per_vector_mask;
+	uint8_t active;
+};
+
+/*
+ * Enables exactly one MSI vector. The provider must install the interrupt
+ * handler/route before returning the message. Caller serializes PCI config
+ * access and must quiesce the device before disabling MSI. MSI-X is separate.
+ */
+int ossd_pci_msi_enable(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *config_context,
+    const struct ossd_pci_device *device,
+    const struct ossd_pci_msi_provider_ops *provider,
+    void *provider_context, struct ossd_pci_msi_state *state);
+void ossd_pci_msi_disable(ossd_pci_config_read_fn read_config,
+    ossd_pci_config_write_fn write_config, void *config_context,
+    const struct ossd_pci_device *device,
+    const struct ossd_pci_msi_provider_ops *provider,
+    void *provider_context, struct ossd_pci_msi_state *state);
+
 struct ossd_pci_ecam_region {
 	uint64_t base_address;
 	uint16_t segment;
